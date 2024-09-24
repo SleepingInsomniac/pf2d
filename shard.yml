@@ -1,0 +1,9 @@
+name: pf2d
+version: 0.1.0
+
+authors:
+  - Alex Clink <alexclink@gmail.com>
+
+crystal: '>= 1.13.2'
+
+license: MIT

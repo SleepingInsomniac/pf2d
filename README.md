@@ -1,6 +1,6 @@
-# pf2d
+# PF2d
 
-PixelFaucet 2D Graphics library
+[PixelFaucet](https://github.com/sleepinginsomniac/pixelfaucet) 2D Graphics library
 
 ## Installation
 

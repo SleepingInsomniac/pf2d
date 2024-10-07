@@ -1,4 +1,4 @@
 require "./spec_helper"
 
-describe Pf2d do
+describe PF2d do
 end

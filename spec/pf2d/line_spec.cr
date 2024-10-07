@@ -1,7 +1,6 @@
-require "./spec_helper"
-require "../src/line"
+require "../spec_helper"
 
-include PF
+include PF2d
 
 describe Line do
 end

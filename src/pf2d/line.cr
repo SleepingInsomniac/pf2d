@@ -1,11 +1,15 @@
 module PF2d
-  # T may be any subtype of Vec(T)
-  # i.g. `Line(Int32)`
+  # Represents a line between two points
+  # `Line(Vec(Int32, 2))`
   #
   struct Line(T)
-    property p1 : Vec(T), p2 : Vec(T)
+    macro [](*args)
+      PF2d::Line(typeof({{args.splat}})).new({{args.splat}})
+    end
 
-    def initialize(@p1 : Vec(T), @p2 : Vec(T))
+    property p1 : T, p2 : T
+
+    def initialize(@p1, @p2)
     end
 
     # The height from the starting point to the ending point

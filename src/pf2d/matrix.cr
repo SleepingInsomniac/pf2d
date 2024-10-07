@@ -6,7 +6,7 @@ module PF2d
     getter width : UInt8
     getter height : UInt8
 
-    # Creates a new square `Matrix` with the given *args*
+    # Creates a new square `Matrix` with the given args.splat*
     #
     # ```
     # m = Matrix[1, 2, 3, 4] # => Matrix(Int32, 4) 2x2 [1, 2, 3, 4]
@@ -14,11 +14,11 @@ module PF2d
     macro [](*args)
       # width and height are the isqrt of args.size
       {% if args.size == 4 %}
-        PF2d::Matrix(typeof({{*args}}), 4).new(2, 2, StaticArray[{{*args}}])
+        PF2d::Matrix(typeof({{args.splat}}), 4).new(2, 2, StaticArray[{{args.splat}}])
       {% elsif args.size == 9 %}
-        PF2d::Matrix(typeof({{*args}}), 9).new(3, 3, StaticArray[{{*args}}])
+        PF2d::Matrix(typeof({{args.splat}}), 9).new(3, 3, StaticArray[{{args.splat}}])
       {% elsif args.size == 16 %}
-        PF2d::Matrix(typeof({{*args}}), 16).new(4, 4, StaticArray[{{*args}}])
+        PF2d::Matrix(typeof({{args.splat}}), 16).new(4, 4, StaticArray[{{args.splat}}])
       {% else %}
         raise "Cannot determine width and height of matrix with {{ args.size }} elements, " \
               "please provide them explicitly Matrix(Int32, 16).new(4, 4, StaticArray[...])"

@@ -1,4 +1,4 @@
-module PF2d::Drawable
+module PF2d::Drawable(T)
   # Draw a line using Bresenham’s Algorithm
   def draw_line(x1 : Int, y1 : Int, x2 : Int, y2 : Int, color)
     # The slope for each axis
@@ -35,6 +35,11 @@ module PF2d::Drawable
   end
 
   # :ditto:
+  def draw_line(x1 : Float, y1 : Float, x2 : Float, y2 : Float, color)
+    draw_line(x1.to_i32, y1.to_i32, x2.to_i32, y2.to_i32, color)
+  end
+
+  # :ditto:
   def draw_line(p1 : PF2d::Vec, p2 : PF2d::Vec, color)
     draw_line(p1.x, p1.y, p2.x, p2.y, color)
   end
@@ -42,5 +47,10 @@ module PF2d::Drawable
   # :ditto:
   def draw_line(line : PF2d::Line, color)
     draw_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y, color)
+  end
+
+  # Draw a horizontal line of *width*
+  def scan_line(x : Int, y : Int, width : Int, color)
+    0.upto(width) { |n| draw_point(x + n, y, color) }
   end
 end

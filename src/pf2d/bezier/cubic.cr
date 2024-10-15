@@ -21,7 +21,7 @@ module PF2d
         6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1)
       end
 
-      def self.extremeties(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
+      def self.extremities(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
         a = 3 * p3 - 9 * p2 + 9 * p1 - 3 * p0
         b = 6 * p0 - 12 * p1 + 6 * p2
         c = 3 * p1 - 3 * p0
@@ -83,11 +83,11 @@ module PF2d
         ].normalized
       end
 
-      # Get the points at the extremeties of this curve
+      # Get the points at the extremities of this curve
       # note: Will return 4 values which are either Float64 | nil
-      def extremeties
-        exts = self.class.extremeties(@p0.x, @p1.x, @p2.x, @p3.x) +
-               self.class.extremeties(@p0.y, @p1.y, @p2.y, @p3.y)
+      def extremities
+        exts = self.class.extremities(@p0.x, @p1.x, @p2.x, @p3.x) +
+               self.class.extremities(@p0.y, @p1.y, @p2.y, @p3.y)
         exts.map { |e| e ? at(e) : e }
       end
 
@@ -99,7 +99,7 @@ module PF2d
         br.x = @p0.x if @p0.x > br.x
         br.y = @p0.y if @p0.y > br.y
 
-        extremeties.each do |e|
+        extremities.each do |e|
           e.try do |e|
             tl.x = e.x if e.x < tl.x
             tl.y = e.y if e.y < tl.y

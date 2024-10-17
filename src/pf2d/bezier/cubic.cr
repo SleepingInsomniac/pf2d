@@ -21,36 +21,34 @@ module PF2d
         6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1)
       end
 
-      def self.extremities(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
-        a = 3 * p3 - 9 * p2 + 9 * p1 - 3 * p0
-        b = 6 * p0 - 12 * p1 + 6 * p2
-        c = 3 * p1 - 3 * p0
+      def self.extrema(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
+        a = 3 * (-p0 + 3 * p1 - 3 * p2 + p3)
+        b = 6 * (p0 - 2 * p1 + p2)
+        c = 3 * (p1 - p0)
 
-        disc = b * b - 4 * a * c
-
-        return {nil, nil} unless disc >= 0
-
-        t1 = (-b + Math.sqrt(disc)) / (2 * a)
-        t2 = (-b - Math.sqrt(disc)) / (2 * a)
-
-        accept_1 = t1 >= 0 && t1 <= 1
-        accept_2 = t2 >= 0 && t2 <= 1
-
-        if accept_1 && accept_2
-          {t1, t2}
-        elsif accept_1
-          {t1, nil}
-        elsif accept_2
-          {nil, t2}
+        if a == 0
+          if b != 0
+            t = -c / b
+            yield t if t >= 0 && t <= 1
+          end
         else
-          {0.5, nil}
+          disc = b * b - 4 * a * c
+
+          return unless disc >= 0
+
+          disc_sqrt = Math.sqrt(disc)
+          t1 = (-b + disc_sqrt) / (2 * a)
+          t2 = (-b - disc_sqrt) / (2 * a)
+
+          yield t1 if t1 >= 0 && t1 <= 1
+          yield t2 if t2 >= 0 && t2 <= 1
         end
       end
 
-      property p0 : PF2d::Vec2(T)
-      property p1 : PF2d::Vec2(T)
-      property p2 : PF2d::Vec2(T)
-      property p3 : PF2d::Vec2(T)
+      property p0 : Vec2(T)
+      property p1 : Vec2(T)
+      property p2 : Vec2(T)
+      property p3 : Vec2(T)
 
       def initialize(@p0, @p1, @p2, @p3)
       end
@@ -85,10 +83,9 @@ module PF2d
 
       # Get the points at the extremities of this curve
       # note: Will return 4 values which are either Float64 | nil
-      def extremities
-        exts = self.class.extremities(@p0.x, @p1.x, @p2.x, @p3.x) +
-               self.class.extremities(@p0.y, @p1.y, @p2.y, @p3.y)
-        exts.map { |e| e ? at(e) : e }
+      def extrema
+        self.class.extrema(@p0.x, @p1.x, @p2.x, @p3.x) { |et| yield at(et) }
+        self.class.extrema(@p0.y, @p1.y, @p2.y, @p3.y) { |et| yield at(et) }
       end
 
       def rect
@@ -99,13 +96,12 @@ module PF2d
         br.x = @p0.x if @p0.x > br.x
         br.y = @p0.y if @p0.y > br.y
 
-        extremities.each do |e|
-          e.try do |e|
-            tl.x = e.x if e.x < tl.x
-            tl.y = e.y if e.y < tl.y
-            br.x = e.x if e.x > br.x
-            br.y = e.y if e.y > br.y
-          end
+        extrema do |e|
+          e = Vec2(T).new(T.new(e.x), T.new(e.y))
+          tl.x = e.x if e.x < tl.x
+          tl.y = e.y if e.y < tl.y
+          br.x = e.x if e.x > br.x
+          br.y = e.y if e.y > br.y
         end
 
         {tl, br}

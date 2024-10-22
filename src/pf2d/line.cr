@@ -4,12 +4,16 @@ module PF2d
   #
   struct Line(T)
     macro [](*args)
-      PF2d::Line(typeof({{args.splat}})).new({{args.splat}})
+      PF2d::Line.new({{args.splat}})
     end
 
     property p1 : T, p2 : T
 
     def initialize(@p1, @p2)
+    end
+
+    def point_pointers
+      {pointerof(@p1), pointerof(@p2)}
     end
 
     # The height from the starting point to the ending point
@@ -97,6 +101,21 @@ module PF2d
     # Normal counter clockwise
     def normal_cc
       Vec[rise, -run].normalized
+    end
+
+    # Return the point where the two lines would intersect unless parallel
+    def intersects?(other : Line(T)) : Vec2(Float64)?
+      x1, y1, x2, y2 = @p1.x, @p1.y, @p2.x, @p2.y
+      x3, y3, x4, y4 = other.p1.x, other.p1.y, other.p2.x, other.p2.y
+
+      denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+
+      return nil if denominator == 0.0
+
+      px = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)
+      py = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)
+
+      Vec[px / denominator, py / denominator]
     end
   end
 end

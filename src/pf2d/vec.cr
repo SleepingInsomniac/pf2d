@@ -14,6 +14,14 @@ module PF2d
         {% end %}
       )
     end
+
+    def self.from_angle(degrees : Number)
+      Vec.from_radians(degrees * Math::PI / 180.0)
+    end
+
+    def self.from_radians(radians : Float64)
+      Vec[Math.cos(radians), Math.sin(radians)]
+    end
   end
 
   {% for i in 2..4 %}
@@ -168,6 +176,10 @@ module PF2d
           Vec{{i}}({{ type }}).new({% for arg in 0...i %} @{{vars[arg].id}}.{{method}}, {% end %})
         end
       {% end %}
+
+      def to_vec2
+        Vec[@x, @y]
+      end
     end
   {% end %}
 end

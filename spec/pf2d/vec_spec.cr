@@ -3,6 +3,12 @@ require "../spec_helper"
 include PF2d
 
 describe Vec do
+  describe ".from_angle" do
+    it "returns the correct normalized vector" do
+      Vec.from_angle(0).should eq(Vec[1.0, 0.0])
+    end
+  end
+
   describe "#*" do
     it "multiplies 2 vectors" do
       v1 = Vec[1, 2]

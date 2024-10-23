@@ -6,13 +6,13 @@ module PF2d
     # The curve intersects points 0 and 3, while points 1 and 2 control the curve
     #
     # For information on the implementation see https://pomax.github.io/bezierinfo
-    struct Cubic(T)
-      include Aproximations
-
-      def self.point(t : Float64, p0 : Number, p1 : Number, p2 : Number, p3 : Number)
+    struct Cubic(T) < Curve(T)
+      # Find the value at *t* along the curve (between 0.0 and 1.0)
+      def self.interpolate(t : Float64, p0 : Number, p1 : Number, p2 : Number, p3 : Number)
         (1 - t) ** 3 * p0 + 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t ** 2 * p2 + t ** 3 * p3
       end
 
+      # The derivative represents the rate of change of the interpolation at *t*
       def self.derivative(t : Float64, p0 : Number, p1 : Number, p2 : Number, p3 : Number)
         3 * (1 - t) ** 2 * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t ** 2 * (p3 - p2)
       end
@@ -21,6 +21,8 @@ module PF2d
         6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1)
       end
 
+      # Find the values that lie at the extrema of the function, i.e. where the rate of change is 0
+      # these points are typically at the edges of a 2d curve
       def self.extrema(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
         a = 3 * (-p0 + 3 * p1 - 3 * p2 + p3)
         b = 6 * (p0 - 2 * p1 + p2)
@@ -45,6 +47,108 @@ module PF2d
         end
       end
 
+      # Solves roots so that t = 0
+      def self.roots(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
+        # Compute coefficients a, b, c, d
+        a = -p0 + 3 * p1 - 3 * p2 + p3
+        b = 3 * p0 - 6 * p1 + 3 * p2
+        c = -3 * p0 + 3 * p1
+        d = p0
+
+        epsilon = 1e-8
+
+        if a.abs < epsilon
+          # Quadratic case
+          if b.abs < epsilon
+            # Linear case
+            if c.abs < epsilon
+              # No solution
+              return
+            else
+              t = -d / c
+              yield t if t >= 0.0 && t <= 1.0
+
+              return
+            end
+          else
+            # Solve quadratic equation: b * t^2 + c * t + d = 0
+            delta = c * c - 4 * b * d
+            if delta.abs < epsilon
+              t = -c / (2 * b)
+              yield t if t >= 0.0 && t <= 1.0
+
+              return
+            elsif delta > 0
+              sqrt_delta = Math.sqrt(delta)
+              t1 = (-c + sqrt_delta) / (2 * b)
+              yield t1 if t1 >= 0.0 && t1 <= 1.0
+              t2 = (-c - sqrt_delta) / (2 * b)
+              yield t2 if t2 >= 0.0 && t2 <= 1.0
+
+              return
+            end
+          end
+        else
+          # Cubic case
+          # Normalize coefficients
+          coef_a = b / a
+          coef_b = c / a
+          coef_c = d / a
+
+          # Compute p and q for depressed cubic
+          p = coef_b - (coef_a * coef_a) / 3.0
+          q = (2.0 * coef_a ** 3) / 27.0 - (coef_a * coef_b) / 3.0 + coef_c
+
+          # Compute discriminant
+          discriminant = (q / 2.0) ** 2 + (p / 3.0) ** 3
+
+          discriminant = 0.0 if discriminant.abs < epsilon
+
+          if discriminant > epsilon
+            # One real root
+            sqrt_disc = Math.sqrt(discriminant)
+            u = cube_root(-q / 2.0 + sqrt_disc)
+            v = cube_root(-q / 2.0 - sqrt_disc)
+            x = u + v
+            t = x - coef_a / 3.0
+
+            yield t if t >= 0.0 && t <= 1.0
+          elsif discriminant.abs < epsilon
+            # Triple or double root
+            u = cube_root(-q / 2.0)
+            x1 = 2 * u
+            x2 = -u
+            t1 = x1 - coef_a / 3.0
+            yield t1 if t1 >= 0.0 && t1 <= 1.0
+            t2 = x2 - coef_a / 3.0
+            yield t2 if t2 >= 0.0 && t2 <= 1.0 && (t2 - t1).abs > epsilon
+          else
+            # Three real roots
+            phi = Math.acos(-q / (2.0 * Math.sqrt(-(p / 3.0) ** 3)))
+            s = 2.0 * Math.sqrt(-p / 3.0)
+            x1 = s * Math.cos(phi / 3.0)
+            x2 = s * Math.cos((phi + 2.0 * Math::PI) / 3.0)
+            x3 = s * Math.cos((phi + 4.0 * Math::PI) / 3.0)
+            t1 = x1 - coef_a / 3.0
+            t2 = x2 - coef_a / 3.0
+            t3 = x3 - coef_a / 3.0
+            {t1, t2, t3}.each do |t|
+              yield t if t >= 0.0 && t <= 1.0
+            end
+          end
+        end
+
+        # If no roots found where t >= 0 && t <= 1
+      end
+
+      def self.cube_root(x : Number)
+        if x >= 0.0
+          x ** (1.0 / 3.0)
+        else
+          -((-x) ** (1.0 / 3.0))
+        end
+      end
+
       property p0 : Vec2(T)
       property p1 : Vec2(T)
       property p2 : Vec2(T)
@@ -53,62 +157,19 @@ module PF2d
       def initialize(@p0, @p1, @p2, @p3)
       end
 
-      def points
+      @[AlwaysInline]
+      def point_pointers
         {pointerof(@p0), pointerof(@p1), pointerof(@p2), pointerof(@p3)}
       end
 
-      # Get the point at percentage *t* < 0 < 1 of the curve
-      def at(t : Float64)
-        PF2d::Vec[
-          T.new(self.class.point(t, @p0.x, @p1.x, @p2.x, @p3.x)),
-          T.new(self.class.point(t, @p0.y, @p1.y, @p2.y, @p3.y)),
-        ]
+      @[AlwaysInline]
+      def points
+        {@p0, @p1, @p2, @p3}
       end
 
-      # Get the tangent to a point at *t* < 0 < 1 on the spline
-      def tangent(t : Float64)
-        PF2d::Vec[
-          T.new(self.class.derivative(t, @p0.x, @p1.x, @p2.x, @p3.x)),
-          T.new(self.class.derivative(t, @p0.y, @p1.y, @p2.y, @p3.y)),
-        ].normalized
-      end
-
-      # Get the normal to a point at *t* < 0 < 1 on the spline
-      def normal(t : Float64)
-        PF2d::Vec[
-          T.new(self.class.derivative(t, @p0.y, @p1.y, @p2.y, @p3.y)),
-          T.new(-self.class.derivative(t, @p0.x, @p1.x, @p2.x, @p3.x)),
-        ].normalized
-      end
-
-      # Get the points at the extremities of this curve
-      # note: Will return 4 values which are either Float64 | nil
-      def extrema
-        self.class.extrema(@p0.x, @p1.x, @p2.x, @p3.x) { |et| yield at(et) }
-        self.class.extrema(@p0.y, @p1.y, @p2.y, @p3.y) { |et| yield at(et) }
-      end
-
-      def rect
-        tl, br = @p0, @p3
-
-        tl.x = @p3.x if @p3.x < tl.x
-        tl.y = @p3.y if @p3.y < tl.y
-        br.x = @p0.x if @p0.x > br.x
-        br.y = @p0.y if @p0.y > br.y
-
-        extrema do |e|
-          e = Vec2(T).new(T.new(e.x), T.new(e.y))
-          tl.x = e.x if e.x < tl.x
-          tl.y = e.y if e.y < tl.y
-          br.x = e.x if e.x > br.x
-          br.y = e.y if e.y > br.y
-        end
-
-        {tl, br}
-      end
-
-      def to_f64
-        Cubic(Float64).new(p0.to_f64, p1.to_f64, p2.to_f64, p3.to_f64)
+      @[AlwaysInline]
+      def control_points : Tuple(Vec2(T), Vec2(T))
+        {@p0, @p3}
       end
     end
   end

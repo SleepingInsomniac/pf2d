@@ -1,9 +1,7 @@
 module PF2d
   module Bezier
-    struct Quad(T)
-      include Aproximations
-
-      def self.point(t : Float64, p0 : Number, p1 : Number, p2 : Number)
+    struct Quad(T) < Curve(T)
+      def self.interpolate(t : Float64, p0 : Number, p1 : Number, p2 : Number)
         (1 - t) ** 2 * p0 + 2 * (1 - t) * t * p1 + t ** 2 * p2
       end
 
@@ -27,6 +25,46 @@ module PF2d
         yield t_extrema
       end
 
+      # Solves roots so that t = 0
+      def self.roots(p0 : Number, p1 : Number, p2 : Number)
+        # Compute coefficients of the quadratic equation a*t^2 + b*t + c = 0
+        a = p0 - 2.0 * p1 + p2
+        b = -2.0 * p0 + 2.0 * p1
+        c = p0
+
+        epsilon = 1e-8
+
+        if a.abs < epsilon
+          # Linear case: a is approximately zero
+          if b.abs < epsilon
+            # Degenerate case: both a and b are approximately zero
+            # No solution unless c is also approximately zero
+            yield 0.0 if c.abs < epsilon
+          else
+            # Solve linear equation b * t + c = 0
+            t = -c / b
+            yield t if t >= 0.0 && t <= 1.0
+          end
+        else
+          # Quadratic case
+          discriminant = b ** 2 - 4.0 * a * c
+
+          if discriminant.abs < epsilon
+            # One real root
+            t = -b / (2.0 * a)
+            yield t if t >= 0.0 && t <= 1.0
+          elsif discriminant > epsilon
+            # Two real roots
+            sqrt_discriminant = Math.sqrt(discriminant)
+            t1 = (-b + sqrt_discriminant) / (2.0 * a)
+            yield t1 if t1 >= 0.0 && t1 <= 1.0
+            t2 = (-b - sqrt_discriminant) / (2.0 * a)
+            yield t2 if t2 >= 0.0 && t2 <= 1.0
+          end
+          # If discriminant < 0, no real roots
+        end
+      end
+
       property p0 : Vec2(T)
       property p1 : Vec2(T)
       property p2 : Vec2(T)
@@ -34,60 +72,24 @@ module PF2d
       def initialize(@p0, @p1, @p2)
       end
 
-      def points
+      @[AlwaysInline]
+      def point_pointers
         {pointerof(@p0), pointerof(@p1), pointerof(@p2)}
       end
 
-      # Get the point at percentage *t* of the curve
-      def at(t : Float64)
-        PF2d::Vec[
-          self.class.point(t, @p0.x, @p1.x, @p2.x),
-          self.class.point(t, @p0.y, @p1.y, @p2.y),
-        ]
+      @[AlwaysInline]
+      def points
+        {@p0, @p1, @p2}
       end
 
-      # Get the tangent to a point at *t* < 0 < 1 on the spline
-      def tangent(t : Float64)
-        PF2d::Vec[
-          T.new(self.class.derivative(t, @p0.x, @p1.x, @p2.x)),
-          T.new(self.class.derivative(t, @p0.y, @p1.y, @p2.y)),
-        ].normalized
+      @[AlwaysInline]
+      def control_point_pointers : Tuple(Vec2(T)*, Vec2(T)*)
+        {pointerof(@p0), pointerof(@p2)}
       end
 
-      # Get the normal to a point at *t* < 0 < 1 on the spline
-      def normal(t : Float64)
-        PF2d::Vec[
-          T.new(self.class.derivative(t, @p0.y, @p1.y, @p2.y)),
-          T.new(-self.class.derivative(t, @p0.x, @p1.x, @p2.x)),
-        ].normalized
-      end
-
-      def extrema
-        self.class.extrema(@p0.x, @p1.x, @p2.x) { |et| yield at(et) }
-        self.class.extrema(@p0.y, @p1.y, @p2.y) { |et| yield at(et) }
-      end
-
-      def rect
-        tl, br = @p0, @p2
-
-        tl.x = @p2.x if @p2.x < tl.x
-        tl.y = @p2.y if @p2.y < tl.y
-        br.x = @p0.x if @p0.x > br.x
-        br.y = @p0.y if @p0.y > br.y
-
-        extrema do |e|
-          e = Vec2(T).new(T.new(e.x), T.new(e.y))
-          tl.x = e.x if e.x < tl.x
-          tl.y = e.y if e.y < tl.y
-          br.x = e.x if e.x > br.x
-          br.y = e.y if e.y > br.y
-        end
-
-        {tl, br}
-      end
-
-      def to_f64
-        Quad(Float64).new(p0.to_f64, p1.to_f64, p2.to_f64)
+      @[AlwaysInline]
+      def control_points : Tuple(Vec2(T), Vec2(T))
+        {@p0, @p2}
       end
     end
   end

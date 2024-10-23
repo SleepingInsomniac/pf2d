@@ -1,5 +1,5 @@
 module PF2d::Drawable(T)
-  def draw_curve(curve : Bezier::Cubic | Bezier::Quad, value : T, samples : Int = 100)
+  def draw_curve(curve : Bezier::Curve, value : T, samples : Int = 100)
     point = curve.p0
     0.upto(samples) do |x|
       t = x / samples

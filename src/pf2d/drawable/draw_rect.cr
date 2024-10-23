@@ -17,6 +17,11 @@ module PF2d::Drawable(T)
   end
 
   # ditto
+  def draw_rect(rect : PF2d::Rect, value : T)
+    draw_rect(rect.top_left.to_i32, rect.bottom_right.to_i32, value)
+  end
+
+  # ditto
   def draw_rect(p1 : PF2d::Vec, p2 : PF2d::Vec, value : T)
     draw_rect(p1.x, p1.y, p2.x, p2.y, value)
   end

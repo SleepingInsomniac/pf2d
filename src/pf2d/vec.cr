@@ -177,6 +177,10 @@ module PF2d
         end
       {% end %}
 
+      def to(type)
+        Vec[{% for arg in 0...i %} type.new(@{{vars[arg].id}}), {% end %}]
+      end
+
       def to_vec2
         Vec[@x, @y]
       end

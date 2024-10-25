@@ -91,6 +91,18 @@ module PF2d
       def control_points : Tuple(Vec2(T), Vec2(T))
         {@p0, @p2}
       end
+
+      # Split this curve into two curves at *t*
+      def split(t : Float64)
+        p01 = Line[@p0, @p1].lerp(t)
+        p12 = Line[@p1, @p2].lerp(t)
+        p012 = Line[p01, p12].lerp(t)
+
+        {
+          Quad.new(@p0.to(T), p01.to(T), p012.to(T)),
+          Quad.new(p012.to(T), p12.to(T), @p2.to(T)),
+        }
+      end
     end
   end
 end

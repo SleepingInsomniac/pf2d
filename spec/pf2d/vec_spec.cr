@@ -136,4 +136,10 @@ describe Vec do
       (v * m).should eq(Vec[13, 31, 49])
     end
   end
+
+  describe "#to" do
+    it "converts to a given type" do
+      Vec[3.0, 3.0].to(Int32).should eq(Vec[3, 3])
+    end
+  end
 end

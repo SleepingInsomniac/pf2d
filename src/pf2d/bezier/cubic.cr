@@ -171,6 +171,41 @@ module PF2d
       def control_points : Tuple(Vec2(T), Vec2(T))
         {@p0, @p3}
       end
+
+      # Split this cubic curve into two quadratic curves
+      def to_quads
+        p01 = (@p0 + @p1) / 2
+        p12 = (@p1 + @p2) / 2
+        p23 = (@p2 + @p3) / 2
+        p012 = (p01 + p12) / 2
+        p123 = (p12 + p23) / 2
+        p0123 = (p012 + p123) / 2
+
+        q0 = @p0
+        q1 = p01 * 0.75 + p012 * 0.75 - @p0 * 0.25 - p0123 * 0.25
+        q2 = p0123
+
+        r0 = p0123
+        r1 = p123 * 0.75 + p23 * 0.75 - p0123 * 0.25 - @p3 * 0.25
+        r2 = @p3
+
+        {Quad.new(q0, q1, q2), Quad.new(r0, r1, r2)}
+      end
+
+      # Split this curve into two curves at *t*
+      def split(t : Float64)
+        p01 = Line[@p0, @p1].lerp(t)
+        p12 = Line[@p1, @p2].lerp(t)
+        p23 = Line[@p2, @p3].lerp(t)
+        p012 = Line[p01, p12].lerp(t)
+        p123 = Line[p12, p23].lerp(t)
+        p0123 = Line[p012, p123].lerp(t)
+
+        {
+          Cubic.new(p0.to(T), p01.to(T), p012.to(T), p0123.to(T)),
+          Cubic.new(p0123.to(T), p123.to(T), p23.to(T), p3.to(T)),
+        }
+      end
     end
   end
 end

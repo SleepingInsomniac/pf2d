@@ -50,7 +50,7 @@ module PF2d::Drawable(T)
   end
 
   # Draw a horizontal line of *width*
-  def scan_line(x : Int, y : Int, width : Int, color)
-    0.upto(width) { |n| draw_point(x + n, y, color) }
+  def scan_line(x : Number, y : Number, width : Number, color)
+    0.upto(width.to_i) { |n| draw_point(x + n, y, color) }
   end
 end

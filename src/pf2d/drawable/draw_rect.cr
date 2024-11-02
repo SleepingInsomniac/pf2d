@@ -1,6 +1,6 @@
 module PF2d::Drawable(T)
   # Draws the outline of a rect
-  def draw_rect(x1 : Number, y1 : Number, x2 : Number, y2 : Number, value : T)
+  def draw_rect(x1 : Int, y1 : Int, x2 : Int, y2 : Int, value : T)
     # draw from top left to bottom right
     y1, y2 = y2, y1 if y1 > y2
     x1, x2 = x2, x1 if x1 > x2
@@ -14,6 +14,10 @@ module PF2d::Drawable(T)
       draw_point(x1, y, value)
       draw_point(x2, y, value)
     end
+  end
+
+  def draw_rect(x1 : Float, y1 : Float, x2 : Float, y2 : Float, value : T)
+    draw_rect(x1.to_i, y1.to_i, x2.to_i, y2.to_i, value)
   end
 
   # ditto

@@ -1,6 +1,6 @@
 module PF2d::Drawable(T)
   # Fill a circle using Bresenham’s Algorithm
-  def fill_circle(cx : Int, cy : Int, r : Int, color)
+  def fill_circle(cx : Number, cy : Number, r : Number, color)
     x, y = 0, r
     balance = 0 - r
 
@@ -26,7 +26,7 @@ module PF2d::Drawable(T)
     end
   end
 
-  def fill_circle(c : PF2d::Vec, r : Int, color)
+  def fill_circle(c : PF2d::Vec, r : Number, color)
     fill_circle(c.x, c.y, r, color)
   end
 end

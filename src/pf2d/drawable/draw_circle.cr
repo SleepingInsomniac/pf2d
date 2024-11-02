@@ -1,6 +1,6 @@
 module PF2d::Drawable(T)
   # Draw a circle using Bresenham’s Algorithm
-  def draw_circle(cx : Int, cy : Int, r : Int, color)
+  def draw_circle(cx : Number, cy : Number, r : Number, color)
     x, y = 0, r
     d = 3 - 2 * r # Decision
 

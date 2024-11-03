@@ -1,6 +1,6 @@
 module PF2d::Drawable(T)
   # Fill an abitrary polygon. Expects a clockwise winding of points
-  def fill_shape(points : Enumerable(PF2d::Vec), pixel)
+  def fill_poly(points : Enumerable(PF2d::Vec), pixel)
     return if points.empty?
     return draw_point(points[0], pixel) if points.size == 1
     return draw_line(points[0], points[1], pixel) if points.size == 2
@@ -61,7 +61,7 @@ module PF2d::Drawable(T)
   end
 
   # :ditto:
-  def fill_shape(*points : PF2d::Vec, pixel)
-    fill_shape(points, pixel)
+  def fill_poly(*points : PF2d::Vec, pixel)
+    fill_poly(points, pixel)
   end
 end

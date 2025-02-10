@@ -82,7 +82,7 @@ module PF2d
       # The points at which a line at *y* intercepts the curve
       def horizontal_intersects(y)
         # shift the points down so that y = 0
-        self.class.roots(*y_values.map(&.-(y))) { |r| yield at(r) }
+        self.class.roots(*y_values.map(&.-(y))) { |r| yield r }
       end
 
       macro inherited

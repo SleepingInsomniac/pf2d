@@ -16,14 +16,14 @@ module PF2d
     end
 
     # Yield quad curves for each set of 3 points
-    def curves
+    def curves(&)
       (0..@points.size - 3).step(2) do |i|
         yield Bezier::Quad.new(@points[i], @points[i + 1], @points[i + 2])
       end
     end
 
     # Yield quad curves for each set of 3 points, wrapping to the beginning
-    def closed_curves
+    def closed_curves(&)
       (0..@points.size - 2).step(2) do |i|
         yield Bezier::Quad.new(@points[i], @points[i + 1], @points[(i + 2) % @points.size])
       end
@@ -52,12 +52,16 @@ module PF2d
       end
     {% end %}
 
-    def horizontal_intersects(y)
+    def horizontal_intersects(y, &)
       closed_curves do |curve|
         curve.horizontal_intersects(y) do |t|
           yield curve, t
         end
       end
+    end
+
+    def merge(other)
+      QuadSpline.new(@points.concat(other.points))
     end
   end
 end

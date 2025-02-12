@@ -88,6 +88,10 @@ module PF2d
         def {{ op.id }}(n : Number)
           Vec[{% for arg in 0...i %} @{{vars[arg].id}} {{op.id}} n, {% end %}]
         end
+
+        def {{ op.id }}(other : Indexable)
+          Vec[{% for arg in 0...i %} @{{vars[arg].id}} {{op.id}} other[{{arg}}], {% end %}]
+        end
       {% end %}
 
       # Add all components together
@@ -176,6 +180,14 @@ module PF2d
           Vec{{i}}({{ type }}).new({% for arg in 0...i %} @{{vars[arg].id}}.{{method}}, {% end %})
         end
       {% end %}
+
+      def round32(precision = 0)
+        Vec{{i}}(Float32).new({% for arg in 0...i %} @{{vars[arg].id}}.to_f32.round(precision), {% end %})
+      end
+
+      def round(precision = 0)
+        Vec{{i}}(Float64).new({% for arg in 0...i %} @{{vars[arg].id}}.to_f64.round(precision), {% end %})
+      end
 
       def to(type)
         Vec[{% for arg in 0...i %} type.new(@{{vars[arg].id}}), {% end %}]

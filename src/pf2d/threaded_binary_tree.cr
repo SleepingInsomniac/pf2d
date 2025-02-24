@@ -22,7 +22,7 @@ module PF2d
         thread_index.try { |ti| values[ti] }
       end
 
-      def insert(values : Enumerable(Node(T)), new_value : T, at : UInt16 = 0, pred_index : UInt16? = nil, &compare : (T, T) -> Int32)
+      def insert(values : Enumerable(Node(T)), new_value : T, compare : (T, T) -> Int32, on_collision : (T, T -> T) | Nil = nil, at : UInt16 = 0, pred_index : UInt16? = nil)
         case compare.call(new_value, @value)
         when .< 0
           # Insert to the left of node on index "at"
@@ -31,7 +31,7 @@ module PF2d
             pred_index.try do |pi|
               pred_index = at if compare.call(@value, values[pi].value) < 0
             end
-            values[li].insert(values, new_value, li, pred_index, &compare)
+            values[li].insert(values, new_value, at: li, pred_index: pred_index, compare: compare, on_collision: on_collision)
           else
             # Create the new node, initial thread points to parent
             values << Node(T).new(new_value, thread_index: at)
@@ -48,7 +48,7 @@ module PF2d
           # Insert to the right of node on index "at"
           if ri = @right_index
             # Node exists, continue traversal, current node "at" become predecessor
-            values[ri].insert(values, new_value, ri, at, &compare)
+            values[ri].insert(values, new_value, at: ri, pred_index: at, compare: compare, on_collision: on_collision)
           else
             # Create the new node, initial thread points to parent's thread
             values << Node(T).new(new_value, thread_index: @thread_index)
@@ -57,14 +57,25 @@ module PF2d
             @thread_index = @right_index
             values[at] = self
           end
+        when .== 0
+          on_collision.try do |proc|
+            # Update the value on comparision collision
+            new_value = proc.call(@value, new_value)
+            @value = new_value
+            values[at] = self
+          end
         end
       end
     end
 
     include Enumerable(T)
 
-    property compare : (T, T) -> Int32
+    property compare : T, T -> Int32
+    property on_collision : (T, T -> T) | Nil
     property values : Array(Node(T)) = Array(Node(T)).new
+
+    def initialize(@compare, @on_collision)
+    end
 
     def initialize(&compare : (T, T) -> Int32)
       @compare = compare
@@ -78,7 +89,7 @@ module PF2d
       if @values.size == 0u16
         @values << Node(T).new(value)
       else
-        @values[0].insert(@values, value, at: 0u16, &@compare)
+        @values[0].insert(@values, value, at: 0u16, compare: @compare, on_collision: @on_collision)
       end
     end
 

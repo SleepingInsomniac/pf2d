@@ -3,15 +3,14 @@ module PF2d::Drawable(T)
 
   record Intercept, x : Float64, d : PF2d::Vec2(Float64)
   @tbt = PF2d::ThreadedBinaryTree(Intercept).new { |v1, v2| v1.x > v2.x ? 1 : -1 }
+  @intercept_group = [] of Intercept
 
   # Fills a spline by the clockwise winding rule
-  @[Experimental("Edge cases are not covered")]
   def fill_spline(spline : QuadSpline, color)
     fill_splines({spline}, color)
   end
 
   # :ditto:
-  @[Experimental("Edge cases are not covered")]
   def fill_splines(splines : Enumerable(QuadSpline), color)
     return if splines.empty?
 
@@ -40,13 +39,26 @@ module PF2d::Drawable(T)
 
       winding = 0 # Count the number of times we cross the curve
 
-      @tbt.each_cons_pair do |i1, i2|
-        winding += 1 if i1.d.y < -EPSILON
-        winding -= 1 if i1.d.y > EPSILON
+      next if @tbt.empty?
+      @intercept_group.clear
+      current_intercept = @tbt.first.value
 
-        if winding > 0
-          scan_line(i1.x, y, (i2.x - i1.x), color)
+      @tbt.each do |intercept|
+        if intercept.x == current_intercept.x
+          @intercept_group << intercept # Accumulate same x values into a group to evaluate the winding
+        else
+          winding += 1 if @intercept_group.any? { |i| i.d.y < -EPSILON } && @intercept_group.none? { |i| i.d.y > 0 }
+          winding -= 1 if @intercept_group.any? { |i| i.d.y > EPSILON } && @intercept_group.none? { |i| i.d.y < 0 }
+
+          x1 = current_intercept.x
+          x2 = (intercept.x - current_intercept.x)
+
+          scan_line(x1, y, x2, color) if winding > 0
+          @intercept_group.clear
+          @intercept_group << intercept
         end
+
+        current_intercept = intercept
       end
     end
   end

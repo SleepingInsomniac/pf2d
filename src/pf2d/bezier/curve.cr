@@ -39,7 +39,7 @@ module PF2d
       end
 
       # Get the points at the extrema of this curve
-      def extrema
+      def extrema(&)
         self.class.extrema(*x_values) { |et| yield at(et) }
         self.class.extrema(*y_values) { |et| yield at(et) }
       end
@@ -79,8 +79,8 @@ module PF2d
         Rect.new(tl, br - tl)
       end
 
-      # The points at which a line at *y* intercepts the curve
-      def horizontal_intersects(y)
+      # The *t* value at which a line at *y* intercepts the curve
+      def horizontal_intersects(y, &)
         # shift the points down so that y = 0
         self.class.roots(*y_values.map(&.-(y))) { |r| yield r }
       end

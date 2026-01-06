@@ -1,9 +1,37 @@
+require "./vec"
+require "./line"
+
 module PF2d
   struct Rect(T)
+    macro [](*args)
+      PF2d::Rect.new({{args.splat}})
+    end
+
     property top_left : Vec2(T)
     property size : Vec2(T)
 
+    def initialize(x : T, y : T, width : T, height : T)
+      @top_left = Vec[x, y]
+      @size = Vec[width, height]
+    end
+
     def initialize(@top_left, @size)
+    end
+
+    def left_edge
+      Line[top_left, bottom_left]
+    end
+
+    def right_edge
+      Line[top_right, bottom_right]
+    end
+
+    def top_edge
+      Line[top_left, top_right]
+    end
+
+    def bottom_edge
+      Line[bottom_left, bottom_right]
     end
 
     def top

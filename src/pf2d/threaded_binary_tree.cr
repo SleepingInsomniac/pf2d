@@ -59,7 +59,7 @@ module PF2d
           end
         when .== 0
           on_collision.try do |proc|
-            # Update the value on comparision collision
+            # Update the value on comparison collision
             new_value = proc.call(@value, new_value)
             @value = new_value
             values[at] = self

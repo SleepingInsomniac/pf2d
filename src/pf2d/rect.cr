@@ -71,5 +71,21 @@ module PF2d
       new_bottom_right.y = other.bottom_right.y if other.bottom_right.y > bottom_right.y
       Rect.new(new_top_left, new_bottom_right - new_top_left)
     end
+
+    def map_points(dest : Rect(Number))
+      scale = size / dest.size
+
+      0.upto(dest.size.y - 1) do |y|
+        sy = ((y * scale.y) + top_left.y).to_i32
+        dy = y + dest.top_left.y
+
+        0.upto(dest.size.x - 1) do |x|
+          sx = ((x * scale.x) + top_left.x).to_i32
+          dx = x + dest.top_left.x
+
+          yield Vec[sx, sy], Vec[dx, dy]
+        end
+      end
+    end
   end
 end

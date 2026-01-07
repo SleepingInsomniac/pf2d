@@ -78,7 +78,7 @@ module PF2d
     def initialize(@matrix)
     end
 
-    # =============
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Reset the transformation to the identity matrix
     def reset
@@ -86,9 +86,7 @@ module PF2d
       self
     end
 
-    # =============
-    # = translate =
-    # =============
+    # translate ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Translate by *x* and *y*
     def translate(x : Number, y : Number)
@@ -101,9 +99,7 @@ module PF2d
       translate(point.x, point.y)
     end
 
-    # ==========
-    # = rotate =
-    # ==========
+    # rotate ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Rotate by *angle* (in radians)
     def rotate(angle : Number)
@@ -111,9 +107,7 @@ module PF2d
       self
     end
 
-    # =========
-    # = scale =
-    # =========
+    # scale ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Scale by *x* and *y*
     def scale(x : Number, y : Number)
@@ -131,9 +125,7 @@ module PF2d
       scale(n, n)
     end
 
-    # =========
-    # = shear =
-    # =========
+    # shear ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Shear by *x* and *y*
     def shear(x : Number, y : Number)
@@ -146,7 +138,7 @@ module PF2d
       shear(point.x, point.y)
     end
 
-    # ==========
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # Return the boudning box of the current transformation matrix
     def bounding_box(x : Number, y : Number)

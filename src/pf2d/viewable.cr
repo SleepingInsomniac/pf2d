@@ -1,6 +1,14 @@
 module PF2d::Viewable(T)
   abstract def size : PF2d::Vec2
 
+  def width
+    size.x
+  end
+
+  def height
+    size.y
+  end
+
   # To be implemented by the including class
   abstract def get_point(x : Number, y : Number)
 

@@ -18,6 +18,14 @@ module PF2d
     def initialize(@top_left, @size)
     end
 
+    def width
+      size.x
+    end
+
+    def height
+      size.y
+    end
+
     def left_edge
       Line[top_left, bottom_left]
     end
@@ -86,6 +94,10 @@ module PF2d
           yield Vec[sx, sy], Vec[dx, dy]
         end
       end
+    end
+
+    def to(type)
+      Rect[top_left.to(type), size.to(type)]
     end
   end
 end

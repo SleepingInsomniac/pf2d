@@ -119,6 +119,10 @@ module PF2d
         {% for arg in 0...i %} @{{vars[arg].id}} * other.{{vars[arg].id}} {% if arg != i - 1 %} + {% end %}{% end %}
       end
 
+      def det(other : Vec2)
+        x * other.y - y * other.x
+      end
+
       # Calculates the cross product of this Vec and *other*
       def cross(other : Vec{{i}})
         {% if i == 2 %}

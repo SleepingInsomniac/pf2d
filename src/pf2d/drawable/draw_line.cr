@@ -49,6 +49,12 @@ module PF2d::Drawable(T)
     draw_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y, color)
   end
 
+  def draw_line(points : Enumerable(PF2d::Vec), color)
+    points.each_cons(2) do |(p1, p2)|
+      draw_line(p1, p2, color)
+    end
+  end
+
   # Draw a horizontal line of *width*
   def scan_line(x : Number, y : Number, width : Number, color)
     0.upto(width.to_i) { |n| draw_point(x + n, y, color) }

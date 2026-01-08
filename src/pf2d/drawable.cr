@@ -13,14 +13,6 @@ module PF2d::Drawable(T)
   def []=(point, value)
     draw_point(point, value)
   end
-
-  def each_point
-    0.upto(height - 1) do |y|
-      0.upto(width - 1) do |x|
-        yield Vec[x, y]
-      end
-    end
-  end
 end
 
 require "./drawable/draw_circle"

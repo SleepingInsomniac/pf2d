@@ -16,4 +16,8 @@ module PF2d::Drawable(T)
   def fill_rect(p1 : PF2d::Vec, p2 : PF2d::Vec, color)
     fill_rect(p1.x, p1.y, p2.x, p2.y, color)
   end
+
+  def fill_rect(rect : PF2d::Rect, color)
+    fill_rect(rect.top_left, rect.bottom_right, color)
+  end
 end

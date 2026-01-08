@@ -72,6 +72,12 @@ module PF2d
       def initialize(@p0, @p1, @p2)
       end
 
+      def initialize(x0 : T, y0 : T, x1 : T, y1 : T, x2 : T, y2 : T)
+        @p0 = Vec[x0, y0]
+        @p1 = Vec[x1, y1]
+        @p2 = Vec[x2, y2]
+      end
+
       @[AlwaysInline]
       def point_pointers
         {pointerof(@p0), pointerof(@p1), pointerof(@p2)}

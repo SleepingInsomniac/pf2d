@@ -25,13 +25,27 @@ module PF2d
       in_bounds?(point.x, point.y)
     end
 
-    abstract def blend(src, dst) : T
+    def each_row(&)
+      0.upto(height - 1) do |y|
+        yield Array.new(width) { |x| get_point(x, y) }
+      end
+    end
 
-    def draw(canvas : Canvas(T), src_rect : Rect(Number), dst_rect : Rect(Number))
+    def each_point
+      0.upto(height - 1) do |y|
+        0.upto(width - 1) do |x|
+          yield Vec[x, y]
+        end
+      end
+    end
+
+    # Copy *canvas* to self, yielding a block with *src* value and *dst* value that will
+    # determine how the values are blended
+    def draw(canvas : Canvas(T), src_rect : Rect(Number), dst_rect : Rect(Number), &)
       src_rect.map_points(dst_rect) do |src, dst|
         if source_color = canvas[src]?
           if dest_color = self[dst]?
-            self[dst] = blend(dest_color, source_color)
+            self[dst] = yield(source_color, dest_color)
           else
             self[dst] = source_color
           end
@@ -39,12 +53,12 @@ module PF2d
       end
     end
 
-    def draw(canvas  : Canvas(T), pos : Vec = Vec[0, 0])
+    def draw(canvas  : Canvas(T), pos : Vec = Vec[0, 0], &)
       canvas.each_point do |src|
         dst = pos + src
         if source_color = canvas[src]?
           if dest_color = self[dst]?
-            self[dst] = blend(dest_color, source_color)
+            self[dst] = yield(source_color, dest_color)
           else
             self[dst] = source_color
           end
@@ -52,8 +66,13 @@ module PF2d
       end
     end
 
-    def draw(canvas  : Canvas(T), src_rect : Rect(Number), pos : Vec = Vec[0, 0])
-      draw(Clip.new(src_rect, canvas), pos)
+    def draw(canvas  : Canvas(T), src_rect : Rect(Number), pos : Vec = Vec[0, 0], &blend)
+      draw(Clip.new(src_rect, canvas), pos, &blend)
+    end
+
+    def draw(*args, **kwargs)
+      # Just return source value if no block given (this will overwrite the entire rect)
+      draw(*args, **kwargs) { |src, dst| src }
     end
   end
 end

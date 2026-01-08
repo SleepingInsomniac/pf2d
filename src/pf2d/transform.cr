@@ -1,6 +1,6 @@
 module PF2d
   class Transform
-    property matrix : PF2d::Matrix(Float64, 9)
+    property matrix : Matrix(Float64, 9)
 
     def self.identity
       PF2d::Matrix[
@@ -142,13 +142,13 @@ module PF2d
 
     # Return the boudning box of the current transformation matrix
     def bounding_box(x : Number, y : Number)
-      top_left = apply(0.0, 0.0)
+      top_left  = apply(0.0, 0.0)
       top_right = apply(x.to_f, 0.0)
       bot_right = apply(x.to_f, y.to_f)
-      bot_left = apply(0.0, y.to_f)
+      bot_left  = apply(0.0, y.to_f)
 
-      xs = Float64[top_left.x, top_right.x, bot_right.x, bot_left.x]
-      ys = Float64[top_left.y, top_right.y, bot_right.y, bot_left.y]
+      xs = {top_left.x, top_right.x, bot_right.x, bot_left.x}
+      ys = {top_left.y, top_right.y, bot_right.y, bot_left.y}
 
       {PF2d::Vec[xs.min, ys.min], PF2d::Vec[xs.max, ys.max]}
     end

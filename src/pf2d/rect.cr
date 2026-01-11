@@ -7,6 +7,8 @@ module PF2d
       PF2d::Rect.new({{args.splat}})
     end
 
+    include Enumerable(Vec2(T))
+
     property top_left : Vec2(T)
     property size : Vec2(T)
 
@@ -96,8 +98,24 @@ module PF2d
       end
     end
 
-    def to(type)
-      Rect[top_left.to(type), size.to(type)]
+    def each(&)
+      0.upto(size.y - 1) do |y|
+        0.upto(size.x - 1) do |x|
+          yield Vec[x, y] + top_left
+        end
+      end
     end
+
+    {% for method, type in {
+      to_i: Int32, to_u: UInt32, to_f: Float64,
+      to_i8: Int8, to_i16: Int16, to_i32: Int32, to_i64: Int64, to_i128: Int128,
+      to_u8: UInt8, to_u16: UInt16, to_u32: UInt32, to_u64: UInt64, to_u128: UInt128,
+      to_f32: Float32, to_f64: Float64,
+    } %}
+      # Return a new Rect as Rect({{ type }})
+      def {{ method }}
+        Rect[top_left.{{method}}, size.{{method}}]
+      end
+    {% end %}
   end
 end

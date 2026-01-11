@@ -8,7 +8,7 @@ module PF2d
     delegate :width, :height, :size, to: rect
 
     def initialize(rect : Rect, @source)
-      @rect = rect.to(Int32)
+      @rect = rect.to_i
     end
 
     def blend(src, dst) : T

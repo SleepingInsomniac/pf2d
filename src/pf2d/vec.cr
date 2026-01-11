@@ -27,6 +27,8 @@ module PF2d
   {% for i in 2..4 %}
     {% vars = %w[x y z w] %}
     struct Vec{{i}}(T) < Vec
+      include Comparable(Vec{{i}})
+
       {% for arg in 0...i %}
         property {{vars[arg].id}} : T
       {% end %}
@@ -53,14 +55,14 @@ module PF2d
         StaticArray[{% for arg in 0...i %} @{{vars[arg].id}}, {% end %}]
       end
 
-      {% for op in %w[> < >= <= ==] %}
-        # Tests if all components of each Vec meet the `{{op.id}}` condition
-        def {{ op.id }}(other : Vec{{i}})
-          {% for arg in 0...i %}
-            return false unless @{{vars[arg].id}} {{op.id}} other.{{vars[arg].id}}
-          {% end %}
-          true
-        end
+      {% for op in %w[> < >= <=] %}
+      #   # Tests if all components of each Vec meet the `{{op.id}}` condition
+      #   def {{ op.id }}(other : Vec{{i}})
+      #     {% for arg in 0...i %}
+      #       return false unless @{{vars[arg].id}} {{op.id}} other.{{vars[arg].id}}
+      #     {% end %}
+      #     true
+      #   end
 
         # Tests if all components of this Vec meet the `{{op.id}}` condition with the given *n*
         def {{ op.id }}(n : Number)
@@ -70,6 +72,15 @@ module PF2d
           true
         end
       {% end %}
+
+      # Compares each component against other.
+      def <=>(other : Vec{{i}})
+        {% for arg in 0...i %}
+          return -1 if @{{vars[i - arg - 1].id}} < other.{{vars[i - arg - 1].id}}
+          return 1 if @{{vars[i - arg - 1].id}} > other.{{vars[i - arg - 1].id}}
+        {% end %}
+        0
+      end
 
       {% for op in %w[- abs] %}
         # Calls `{{ op.id }}` on all components of this Vec
@@ -199,6 +210,10 @@ module PF2d
 
       def to_vec2
         Vec[@x, @y]
+      end
+
+      def to_tuple
+        Tuple.new({% for arg in 0...i %} @{{vars[arg].id}}, {% end %})
       end
     end
   {% end %}

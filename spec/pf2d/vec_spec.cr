@@ -139,7 +139,32 @@ describe Vec do
 
   describe "#to" do
     it "converts to a given type" do
-      Vec[3.0, 3.0].to(Int32).should eq(Vec[3, 3])
+      Vec[3.0, 3.0].to_i.should eq(Vec[3, 3])
+    end
+  end
+
+  describe "#>,<,>=,<=(Number)" do
+    it "compares to all components" do
+      (Vec[2,2] > 1).should eq(true)
+    end
+  end
+
+  describe "#<=>" do
+    it "returns 1 if the last component is larger, lexicographically" do
+      v1 = Vec[2, 5] # Vec2 y >
+      v2 = Vec[1, 1]
+      (v1 <=> v2).should eq(1)
+    end
+
+    it "returns -1 when smaller" do
+      (Vec[10, 1] <=> Vec[20, 2]).should eq(-1)
+    end
+  end
+
+  describe "#==" do
+    it "compares equality" do
+      v1 = Vec[1, 2]
+      v2 = Vec[1, 2]
     end
   end
 end

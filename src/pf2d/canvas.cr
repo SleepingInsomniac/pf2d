@@ -1,10 +1,12 @@
 require "./drawable"
 require "./viewable"
+require "./vec"
 
 module PF2d
   module Canvas(T)
     include Drawable(T)
     include Viewable(T)
+    include Enumerable(Tuple(Vec2(Int32), T))
 
     macro [](*args)
       {{@type}}.new({{ args.splat }})
@@ -31,10 +33,18 @@ module PF2d
       end
     end
 
-    def each_point
+    def each_point(&)
       0.upto(height - 1) do |y|
         0.upto(width - 1) do |x|
           yield Vec[x, y]
+        end
+      end
+    end
+
+    def each(&)
+      0.upto(height - 1) do |y|
+        0.upto(height - 1) do |x|
+          yield({Vec[x, y].to_i32, self[x, y]})
         end
       end
     end
@@ -73,6 +83,10 @@ module PF2d
     def draw(*args, **kwargs)
       # Just return source value if no block given (this will overwrite the entire rect)
       draw(*args, **kwargs) { |src, dst| src }
+    end
+
+    def clip(rect : Rect)
+      Clip.new(rect, self)
     end
   end
 end

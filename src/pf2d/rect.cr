@@ -65,11 +65,13 @@ module PF2d
     end
 
     def covers?(point : Vec)
-      top_left <= point && point <= bottom_right
+      top_left.x <= point.x && top_left.y <= point.y &&
+        bottom_right.x >= point.x && bottom_right.y >= point.y
     end
 
     def covers?(other : Rect)
-      top_left <= other.top_left && size >= other.size
+      top_left.x <= other.top_left.x && top_left.y <= other.top_left.y &&
+        bottom_right.x >= other.bottom_right.x && bottom_right.y >= other.bottom_right.y
     end
 
     def merge(other : Rect)

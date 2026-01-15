@@ -126,6 +126,7 @@ module PF2d
         {% for arg in 0...i %} @{{vars[arg].id}} * other.{{vars[arg].id}} {% if arg != i - 1 %} + {% end %}{% end %}
       end
 
+      # Determinant
       def det(other : Vec2)
         x * other.y - y * other.x
       end

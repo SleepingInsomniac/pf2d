@@ -35,7 +35,7 @@ module PF2d::Drawable(T)
   end
 
   # :ditto:
-  def draw_line(x1 : Float, y1 : Float, x2 : Float, y2 : Float, color)
+  def draw_line(x1 : Number, y1 : Number, x2 : Number, y2 : Number, color)
     draw_line(x1.to_i32, y1.to_i32, x2.to_i32, y2.to_i32, color)
   end
 

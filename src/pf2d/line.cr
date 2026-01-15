@@ -98,7 +98,11 @@ module PF2d
 
     # Convert this line into a normalized vector
     def to_vector
-      (@p2 - @p1).normalized
+      direction.normalized
+    end
+
+    def direction
+      @p2 - @p1
     end
 
     # Find the normal axis to this line

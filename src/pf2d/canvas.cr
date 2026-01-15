@@ -19,6 +19,10 @@ module PF2d
       Vec[width, height]
     end
 
+    def rect
+      Rect[Vec[0, 0], size.to_i32]
+    end
+
     def in_bounds?(x, y)
       x >= 0 && y >= 0 && x < width && y < height
     end

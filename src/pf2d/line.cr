@@ -131,7 +131,8 @@ module PF2d
       t = offset.det(d2) / denominator
       u = offset.det(d1) / denominator
 
-      return nil unless t >= 0.0 && u >= 0.0 && u <= 1.0
+      return nil unless (0.0 <= t && t <= 1.0 &&
+                         0.0 <= u && u <= 1.0)
 
       @p1 + d1 * t
     end

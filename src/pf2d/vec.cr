@@ -8,11 +8,7 @@ module PF2d
     # PF2d::Vec[1, 2] # => PF2d::Vec2(Int32)(@x=1, @y=2)
     # ```
     macro [](*args)
-      PF2d::Vec{{args.size}}(typeof({{args.splat}})).new(
-        {% for arg in args %}
-          {{ arg }},
-        {% end %}
-      )
+      PF2d::Vec{{args.size}}(typeof({{args.splat}})).new({{args.splat}})
     end
 
     def self.from_angle(degrees : Number)
@@ -165,6 +161,13 @@ module PF2d
       # Returns the distance between this Vec and *other*
       def distance(other : Vec{{i}})
         (self - other).magnitude
+      end
+
+      def rotate(angle : Float)
+        Vec[
+          (x * Math.cos(angle) - y * Math.sin(angle)),
+          (x * Math.sin(angle) + y * Math.cos(angle))
+        ]
       end
 
       # Multiply this Vec by a *matrix*

@@ -1,5 +1,4 @@
 require "./vec"
-require "./line"
 
 module PF2d
   # Represents a line between two points
@@ -121,20 +120,37 @@ module PF2d
       Rect[tl, br - tl]
     end
 
+    # Return the point where the two lines intersect unless parallel
+    def intersect?(other : Line)
+      d1, d2 = direction, other.direction
+      offset = other.p1 - @p1
+      denominator = d1.det(d2)
+
+      return nil if denominator.abs <= 1e-9
+
+      t = offset.det(d2) / denominator
+      u = offset.det(d1) / denominator
+
+      return nil unless t >= 0.0 && u >= 0.0 && u <= 1.0
+
+      @p1 + d1 * t
+    end
+
     # Return the point where the two lines would intersect unless parallel
+    def unbounded_intersect?(other : Line)
+      d1, d2 = direction, other.direction
+      denominator = d1.det(d2)
+
+      return nil if denominator.abs <= 1e-9
+
+      p = d2 * @p2.det(@p1) - d1 * other.p2.det(other.p1)
+      p / denominator
+    end
+
+    # Return the point where the two lines would intersect unless parallel
+    @[Deprecated("Use #intersect?")]
     def intersects?(other : Line(T))
-      x1, y1, x2, y2 = @p1.x, @p1.y, @p2.x, @p2.y
-      x3, y3, x4, y4 = other.p1.x, other.p1.y, other.p2.x, other.p2.y
-
-      denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-
-      return nil if denominator == 0.0
-
-      px = (x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)
-      py = (x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)
-
-      intersection = Vec[px / denominator, py / denominator]
-      rect.covers?(intersection) && other.rect.covers?(intersection) ? intersection : nil
+      intersect?(other)
     end
   end
 end

@@ -1,23 +1,14 @@
 module PF2d
+  # A `Grid` is a generic drawable and viewable 2d array
   alias Grid = GridSlice
 
-  {% for t in [Array, Slice] %}
-  # A `Grid` is a generic drawable and viewable 2d array of any type
-  class Grid{{t}}
+  # All points laid out contiguously
+  abstract class LinearGrid(T)
     include Canvas(T)
 
-    getter width : Int32, height : Int32
-    property data : {{t}}
-
-    def initialize(@data, @width, @height)
-    end
-
-    def initialize(@width, @height)
-      @data = {{t}}.new(@width * @height) do |i|
-        y, x = i.divmod(@width)
-        yield(Vec[x, y], size)
-      end
-    end
+    abstract def width
+    abstract def height
+    abstract def data
 
     def i(x, y)
       y * width + x
@@ -37,5 +28,23 @@ module PF2d
       data[(y * width)..(y * width + (width - 1))]
     end
   end
+
+  {% for t in [Array, Slice] %}
+    class Grid{{t}} < LinearGrid(T)
+      include Canvas(T)
+
+      getter width : Int32, height : Int32
+      property data : {{t}}
+
+      def initialize(@data, @width, @height)
+      end
+
+      def initialize(@width, @height)
+        @data = {{t}}.new(@width * @height) do |i|
+          y, x = i.divmod(@width)
+          yield(Vec[x, y], size)
+        end
+      end
+    end
   {% end %}
 end

@@ -157,17 +157,14 @@ module PF2d
       def initialize(@p0, @p1, @p2, @p3)
       end
 
-      @[AlwaysInline]
       def point_pointers
         {pointerof(@p0), pointerof(@p1), pointerof(@p2), pointerof(@p3)}
       end
 
-      @[AlwaysInline]
       def points
         {@p0, @p1, @p2, @p3}
       end
 
-      @[AlwaysInline]
       def control_points : Tuple(Vec2(T), Vec2(T))
         {@p0, @p3}
       end

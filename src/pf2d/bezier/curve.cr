@@ -4,12 +4,10 @@ module PF2d
       abstract def points
       abstract def control_points : Tuple(Vec2(T), Vec2(T))
 
-      @[AlwaysInline]
       def x_values
         points.map { |p| p.x }
       end
 
-      @[AlwaysInline]
       def y_values
         points.map { |p| p.y }
       end

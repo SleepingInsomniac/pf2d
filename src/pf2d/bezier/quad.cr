@@ -78,22 +78,18 @@ module PF2d
         @p2 = Vec[x2, y2]
       end
 
-      @[AlwaysInline]
       def point_pointers
         {pointerof(@p0), pointerof(@p1), pointerof(@p2)}
       end
 
-      @[AlwaysInline]
       def points
         {@p0, @p1, @p2}
       end
 
-      @[AlwaysInline]
       def control_point_pointers : Tuple(Vec2(T)*, Vec2(T)*)
         {pointerof(@p0), pointerof(@p2)}
       end
 
-      @[AlwaysInline]
       def control_points : Tuple(Vec2(T), Vec2(T))
         {@p0, @p2}
       end

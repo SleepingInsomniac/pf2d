@@ -11,10 +11,6 @@ module PF2d
       @rect = rect.to_i
     end
 
-    def blend(src, dst) : T
-      source.blend(src, dst)
-    end
-
     def get_point?(x, y) : T?
       return nil unless in_bounds?(x, y)
       p = Vec[x, y] + rect.top_left

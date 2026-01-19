@@ -1,6 +1,3 @@
-require "./vec"
-require "./line"
-
 module PF2d
   struct Rect(T)
     macro [](*args)
@@ -49,7 +46,15 @@ module PF2d
     end
 
     def bottom
-      top_left.y + size.y
+      top_left.y + size.y - 1
+    end
+
+    def left
+      top_left.x
+    end
+
+    def right
+      top_left.x + size.x - 1
     end
 
     def top_right
@@ -57,11 +62,23 @@ module PF2d
     end
 
     def bottom_right
-      top_left + size
+      top_left + size - 1
     end
 
     def bottom_left
-      top_left + Vec[T.new(0), size.y]
+      top_left + Vec[T.new(0), size.y - 1]
+    end
+
+    def center
+      top_left + size / 2
+    end
+
+    def area
+      size.x * size.y
+    end
+
+    def covers?(x, y)
+      covers?(Vec[x, y])
     end
 
     def covers?(point : Vec)
@@ -74,14 +91,27 @@ module PF2d
         bottom_right.x >= other.bottom_right.x && bottom_right.y >= other.bottom_right.y
     end
 
+    def intersection?(other : Rect)
+      left   = top_left.x > other.top_left.x ? top_left.x : other.top_left.x
+      top    = top_left.y > other.top_left.y ? top_left.y : other.top_left.y
+      right  = bottom_right.x < other.bottom_right.x ? bottom_right.x : other.bottom_right.x
+      bottom = bottom_right.y < other.bottom_right.y ? bottom_right.y : other.bottom_right.y
+
+      width  = right - left + 1
+      height = bottom - top + 1
+
+      return nil if width <= 0 || height <= 0
+
+      Rect[Vec[left, top], Vec[width, height]]
+    end
+
     def merge(other : Rect)
-      new_top_left = top_left
-      new_bottom_right = bottom_right
-      new_top_left.x = other.top_left.x if other.top_left.x < top_left.x
-      new_top_left.y = other.top_left.y if other.top_left.y < top_left.y
-      new_bottom_right.x = other.bottom_right.x if other.bottom_right.x > bottom_right.x
-      new_bottom_right.y = other.bottom_right.y if other.bottom_right.y > bottom_right.y
-      Rect.new(new_top_left, new_bottom_right - new_top_left)
+      min_x = {top_left.x, other.top_left.x}.min
+      min_y = {top_left.y, other.top_left.y}.min
+      max_x = {bottom_right.x + 1, other.bottom_right.x + 1}.max
+      max_y = {bottom_right.y + 1, other.bottom_right.y + 1}.max
+
+      Rect[Vec[min_x, min_y], Vec[max_x - min_x, max_y - min_y]]
     end
 
     def map_points(dest : Rect(Number))
@@ -98,6 +128,13 @@ module PF2d
           yield Vec[sx, sy], Vec[dx, dy]
         end
       end
+    end
+
+    def to_tris(cast = T)
+      {
+        Tri[top_left.to(cast), top_right.to(cast), bottom_right.to(cast)],
+        Tri[top_left.to(cast), bottom_right.to(cast), bottom_left.to(cast)],
+      }
     end
 
     def each(&)

@@ -16,7 +16,7 @@ module PF2d
     end
 
     def point_pointers
-      {pointerof(p1), pointerof(p2), pointerof(p3), pointerof(p4)}
+      {pointerof(@p1), pointerof(@p2), pointerof(@p3), pointerof(@p4)}
     end
 
     def line_1

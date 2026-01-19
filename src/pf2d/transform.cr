@@ -160,7 +160,7 @@ module PF2d
     end
 
     def apply(x : Number, y : Number)
-      result = PF2d::Vec[x, y, 1.0] * @matrix
+      result = PF2d::Vec[x.to_f, y.to_f, 1.0] * @matrix
       PF2d::Vec[result.x, result.y]
     end
 

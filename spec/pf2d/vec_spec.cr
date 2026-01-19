@@ -150,14 +150,8 @@ describe Vec do
   end
 
   describe "#<=>" do
-    it "returns 1 if the last component is larger, lexicographically" do
-      v1 = Vec[2, 5] # Vec2 y >
-      v2 = Vec[1, 1]
-      (v1 <=> v2).should eq(1)
-    end
-
-    it "returns -1 when smaller" do
-      (Vec[10, 1] <=> Vec[20, 2]).should eq(-1)
+    it "compares y major" do
+      (Vec[2, 1] <=> Vec[1, 2]).should eq(-1)
     end
   end
 
@@ -165,6 +159,12 @@ describe Vec do
     it "compares equality" do
       v1 = Vec[1, 2]
       v2 = Vec[1, 2]
+    end
+  end
+
+  describe "#to_tuple" do
+    it "includes all the components" do
+      Vec[1,2,3].to_tuple.should eq({1,2,3})
     end
   end
 end

@@ -10,12 +10,16 @@ describe Rect do
       r.covers?(Vec[12, 22]).should be_true
     end
 
-    it "covers a point on the edges" do
-      r = Rect[10, 20, 5, 4]
-      r.covers?(Vec[10, 20]).should be_true # top_left
-      r.covers?(Vec[15, 20]).should be_true # top_right
-      r.covers?(Vec[10, 24]).should be_true # bottom_left
-      r.covers?(Vec[15, 24]).should be_true # bottom_right
+    it "covers a point on the top and left edge" do
+      r = Rect[5, 5, 5, 5]
+      r.covers?(Vec[5, 5]).should be_true
+      r.covers?(Vec[4, 4]).should be_false
+    end
+
+    it "covers a point on the bottom and right edge" do
+      r = Rect[5, 5, 5, 5]
+      r.covers?(Vec[9, 9]).should be_true
+      r.covers?(Vec[10, 10]).should be_false
     end
 
     it "does not cover a point outside the rect" do
@@ -48,17 +52,17 @@ describe Rect do
 
   describe "#merge" do
     it "returns a rect that covers both rectangles" do
-      a = Rect[10, 20, 5, 4]
-      b = Rect[12, 18, 10, 3]
+      a = Rect[1, 1, 10, 10]
+      b = Rect[5, 5, 10, 10]
 
       m = a.merge(b)
 
-      m.top_left.should eq(Vec[10, 18])
-      m.bottom_right.should eq(Vec[22, 24])
-      m.size.should eq(Vec[12, 6])
+      m.top_left.should eq(Vec[1, 1])
+      m.bottom_right.should eq(Vec[14, 14])
+      m.size.should eq(Vec[14, 14])
     end
 
-    it "keeps th same bounds when merging with a contained rect" do
+    it "keeps the same bounds when merging with a contained rect" do
       outer = Rect[0, 0, 10, 10]
       inner = Rect[2, 3, 4, 5]
 
@@ -82,7 +86,7 @@ describe Rect do
       m = a.merge(b)
 
       m.top_left.should eq(Vec[0, 0])
-      m.bottom_right.should eq(Vec[11, 11])
+      m.bottom_right.should eq(Vec[10, 10])
       m.size.should eq(Vec[11, 11])
     end
   end
@@ -136,6 +140,16 @@ describe Rect do
         Vec[0, 0], Vec[1, 0], Vec[2, 0],
         Vec[0, 1], Vec[1, 1], Vec[2, 1],
       ])
+    end
+  end
+
+  describe "#intersection?" do
+    it "returns nil if the rects do not intersect" do
+      Rect[0, 0, 10, 10].intersection?(Rect[10, 10, 10, 10]).should be_nil
+    end
+
+    it "returns a rect that covers the intersection" do
+      Rect[0, 0, 10, 10].intersection?(Rect[5, 5, 10, 10]).should eq(Rect[5,5,5,5])
     end
   end
 end

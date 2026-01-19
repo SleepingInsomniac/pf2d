@@ -51,6 +51,13 @@ module PF2d
       Rect[tl, sz]
     end
 
+    def tris(cast = T)
+      {
+        Tri[@p1.to(cast), @p2.to(cast), @p4.to(cast)],
+        Tri[@p2.to(cast), @p3.to(cast), @p4.to(cast)],
+      }
+    end
+
     # TODO
     # def map_points(other : Quad)
     # end

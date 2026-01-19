@@ -130,7 +130,12 @@ module PF2d
       end
     end
 
+    @[Deprecated("Use #tris")]
     def to_tris(cast = T)
+      tris(cast)
+    end
+
+    def tris(cast = T)
       {
         Tri[top_left.to(cast), top_right.to(cast), bottom_left.to(cast)],
         Tri[top_right.to(cast), bottom_right.to(cast), bottom_left.to(cast)],

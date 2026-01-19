@@ -1,7 +1,3 @@
-require "./drawable"
-require "./viewable"
-require "./vec"
-
 module PF2d
   module Canvas(T)
     include Drawable(T)
@@ -80,13 +76,17 @@ module PF2d
       end
     end
 
+    def draw(canvas  : Canvas(T), pos : Vec = Vec[0, 0])
+      draw(canvas, pos) { |src, dst| src }
+    end
+
     def draw(canvas  : Canvas(T), src_rect : Rect(Number), pos : Vec = Vec[0, 0], &blend)
       draw(Clip.new(src_rect, canvas), pos, &blend)
     end
 
-    def draw(*args, **kwargs)
+    def draw(canvas  : Canvas(T), src_rect : Rect(Number), pos : Vec = Vec[0, 0])
       # Just return source value if no block given (this will overwrite the entire rect)
-      draw(*args, **kwargs) { |src, dst| src }
+      draw(canvas, src_rect, pos) { |src, dst| src }
     end
 
     def clip(rect : Rect)

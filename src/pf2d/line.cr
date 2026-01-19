@@ -1,5 +1,3 @@
-require "./vec"
-
 module PF2d
   # Represents a line between two points
   # `Line(Vec(Int32, 2))`

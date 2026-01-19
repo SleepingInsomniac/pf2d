@@ -1,4 +1,12 @@
 module PF2d
+  # struct PV
+  #   getter uv : Vec2(Float64)
+  #   getter q  : Float64
+  #
+  #   def initialize(@uv, @q)
+  #   end
+  # end
+
   struct Tri(T)
     macro [](*args)
       PF2d::Tri.new({{args.splat}})
@@ -54,7 +62,7 @@ module PF2d
 
     # Maps points from self to *dest* with affine interpolation
     # useful for sampling textures
-    def map_points(dest : Tri(Number))
+    def map_points(dest : Tri(Number), q0 : Float = 1.0, q1 : Float = 1.0, q2 : Float = 1.0)
       min_y.to_i.upto(max_y.ceil.to_i) do |y|
         min_x.to_i.upto(max_x.ceil.to_i) do |x|
           p = Vec[x, y]
@@ -62,13 +70,20 @@ module PF2d
 
           next if w.nil?
 
-          w0, w1, w2 = w
+          b0, b1, b2 = w
+          next if b0 < -1e-9 || b1 < -1e-9 || b2 < -1e-9
 
-          next if w0 < -1e-9 || w1 < -1e-9 || w2 < -1e-9
+          q  = b0 * q0 + b1 * q1 + b2 * q2
+          next if q.abs <= 1e-18
 
-          sp = dest.p1 * w0 + dest.p2 * w1 + dest.p3 * w2
+          sp_num =
+            (dest.p1 * (b0 * q0)) +
+            (dest.p2 * (b1 * q1)) +
+            (dest.p3 * (b2 * q2))
+
+          sp = sp_num / q
+
           dp = Vec[x.to_f, y.to_f]
-
           yield({sp, dp})
         end
       end

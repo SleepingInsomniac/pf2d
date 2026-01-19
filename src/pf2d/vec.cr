@@ -1,5 +1,3 @@
-require "./matrix"
-
 module PF2d
   abstract struct Vec
     # Creates a new `Vec` with the given *args*
@@ -52,14 +50,6 @@ module PF2d
       end
 
       {% for op in %w[> < >= <=] %}
-      #   # Tests if all components of each Vec meet the `{{op.id}}` condition
-      #   def {{ op.id }}(other : Vec{{i}})
-      #     {% for arg in 0...i %}
-      #       return false unless @{{vars[arg].id}} {{op.id}} other.{{vars[arg].id}}
-      #     {% end %}
-      #     true
-      #   end
-
         # Tests if all components of this Vec meet the `{{op.id}}` condition with the given *n*
         def {{ op.id }}(n : Number)
           {% for arg in 0...i %}
@@ -164,12 +154,14 @@ module PF2d
         (self - other).magnitude
       end
 
-      def rotate(angle : Float)
-        Vec[
-          (x * Math.cos(angle) - y * Math.sin(angle)),
-          (x * Math.sin(angle) + y * Math.cos(angle))
-        ]
-      end
+      {% if i == 2 %}
+        def rotate(radians : Float)
+          Vec[
+            (x * Math.cos(radians) - y * Math.sin(radians)),
+            (x * Math.sin(radians) + y * Math.cos(radians))
+          ]
+        end
+      {% end %}
 
       # Multiply this Vec by a *matrix*
       #
@@ -217,7 +209,7 @@ module PF2d
       end
 
       def to_tuple
-        Tuple.new({% for arg in 0...i %} @{{vars[arg].id}}, {% end %})
+        Tuple.new({{ vars[0...i].map { |v| "@#{v.id}" }.join(", ").id }})
       end
     end
   {% end %}

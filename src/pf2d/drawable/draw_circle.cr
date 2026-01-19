@@ -30,4 +30,8 @@ module PF2d::Drawable(T)
   def draw_circle(c : Vec, r, color)
     draw_circle(c.x, c.y, r, color)
   end
+
+  def draw(c : Circle, color)
+    draw_circle(c.center, c.radius, color)
+  end
 end

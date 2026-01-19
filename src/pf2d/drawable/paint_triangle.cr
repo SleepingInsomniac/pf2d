@@ -101,10 +101,10 @@ module PF2d::Drawable(T)
               # multiply the point by the size of the texture to get the final texture point
               sample_point = ((PF2d::Vec[texture_point.x, texture_point.y] / texture_point.z) * texture.size)
               # Invert the y axis for the sprite
-              sample_point.y = texture.height - sample_point.y
-              sample_point %= texture.size
+              sample_point.y = tx.height - sample_point.y
+              sample_point %= tx.size
 
-              color = texture.get_point(sample_point.to_i)
+              color = tx.get_point(sample_point.to_i)
 
               # Blend the color sample with the provided color
               color = color.darken(tint)

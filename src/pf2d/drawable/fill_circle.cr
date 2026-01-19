@@ -29,4 +29,12 @@ module PF2d::Drawable(T)
   def fill_circle(c : PF2d::Vec, r : Number, color)
     fill_circle(c.x, c.y, r, color)
   end
+
+  def fill_circle(c : Circle, color)
+    fill_circle(c.center, c.radius, color)
+  end
+
+  def fill(c : Circle, color)
+    fill_circle(c, color)
+  end
 end

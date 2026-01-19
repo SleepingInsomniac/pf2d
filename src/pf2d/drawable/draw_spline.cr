@@ -6,4 +6,8 @@ module PF2d::Drawable(T)
       spline.curves { |curve| draw_curve(curve, value, samples) }
     end
   end
+
+  def draw(spline : QuadSpline, value : T, samples : Int = 100, closed : Bool = false)
+    draw_spline(spline, value, samples, closed)
+  end
 end

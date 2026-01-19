@@ -6,6 +6,10 @@ module PF2d::Drawable(T)
     draw_point(point.x, point.y, value)
   end
 
+  def draw(point : PF2d::Vec, value : T)
+    draw_point(point, value)
+  end
+
   def []=(x, y, value)
     draw_point(x, y, value)
   end

@@ -1,5 +1,6 @@
 module PF2d::Drawable(T)
   # Fill an abitrary polygon. Expects a clockwise winding of points
+  # TODO: create function to determine if inside poly
   def fill_poly(points : Enumerable(PF2d::Vec), pixel)
     return if points.empty?
     return draw_point(points[0], pixel) if points.size == 1

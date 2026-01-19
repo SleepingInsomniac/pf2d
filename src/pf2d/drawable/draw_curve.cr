@@ -8,4 +8,8 @@ module PF2d::Drawable(T)
       point = next_point
     end
   end
+
+  def draw(curve : Bezier::Curve, value : T, samples : Int = 100)
+    draw_curve(curve, value, samples)
+  end
 end

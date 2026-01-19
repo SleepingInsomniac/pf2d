@@ -132,8 +132,8 @@ module PF2d
 
     def to_tris(cast = T)
       {
-        Tri[top_left.to(cast), top_right.to(cast), bottom_right.to(cast)],
-        Tri[top_left.to(cast), bottom_right.to(cast), bottom_left.to(cast)],
+        Tri[top_left.to(cast), top_right.to(cast), bottom_left.to(cast)],
+        Tri[top_right.to(cast), bottom_right.to(cast), bottom_left.to(cast)],
       }
     end
 

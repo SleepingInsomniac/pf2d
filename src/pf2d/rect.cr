@@ -114,20 +114,33 @@ module PF2d
       Rect[Vec[min_x, min_y], Vec[max_x - min_x, max_y - min_y]]
     end
 
+    def map_points(dest : Rect(Number), scale : Vec2(Float), &)
+      step = (scale * 65536.0f32).to_i32
+      origin = (top_left * 65536.0f32).to_i32
+
+      src_y = origin.y
+      0.upto(dest.size.y.to_i - 1) do |y|
+        dest_y = y + dest.top_left.y
+        src_x = origin.x
+
+        0.upto(dest.size.x.to_i - 1) do |x|
+          dest_x = x + dest.top_left.x
+
+          yield Vec[src_x >> 16, src_y >> 16], Vec[dest_x, dest_y]
+          src_x &+= step.x
+        end
+
+        src_y &+= step.y
+      end
+    end
+
     def map_points(dest : Rect(Number))
       scale = size / dest.size
+      map_points(dest, scale) { |s, d| yield(s,d) }
+    end
 
-      0.upto(dest.size.y - 1) do |y|
-        sy = ((y * scale.y) + top_left.y).to_i32
-        dy = y + dest.top_left.y
-
-        0.upto(dest.size.x - 1) do |x|
-          sx = ((x * scale.x) + top_left.x).to_i32
-          dx = x + dest.top_left.x
-
-          yield Vec[sx, sy], Vec[dx, dy]
-        end
-      end
+    def quad
+      Quad[top_left, top_right, bottom_right, bottom_left]
     end
 
     @[Deprecated("Use #tris")]

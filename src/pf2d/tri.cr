@@ -83,8 +83,7 @@ module PF2d
 
           sp = sp_num / q
 
-          dp = Vec[x.to_f, y.to_f]
-          yield({sp, dp})
+          yield sp, p
         end
       end
     end

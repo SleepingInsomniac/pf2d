@@ -30,6 +30,16 @@ module PF2d
     end
 
     def rect
+      top_left = @points.first
+      bottom_right = top_left
+      curves do |curve|
+        rect = curve.rect
+        top_left.x = rect.top_left.x if rect.top_left.x < top_left.x
+        top_left.y = rect.top_left.y if rect.top_left.y < top_left.y
+        bottom_right.x = rect.bottom_right.x if rect.bottom_right.x > bottom_right.x
+        bottom_right.y = rect.bottom_right.y if rect.bottom_right.y > bottom_right.y
+      end
+      Rect.new(top_left, bottom_right - top_left + 1)
     end
 
     def closed_rect
@@ -42,7 +52,7 @@ module PF2d
         bottom_right.x = rect.bottom_right.x if rect.bottom_right.x > bottom_right.x
         bottom_right.y = rect.bottom_right.y if rect.bottom_right.y > bottom_right.y
       end
-      Rect.new(top_left, bottom_right - top_left)
+      Rect.new(top_left, bottom_right - top_left + 1)
     end
 
     {% for op in %w[* / // + - % **] %}

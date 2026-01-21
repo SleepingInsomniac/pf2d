@@ -51,8 +51,21 @@ module PF2d
 
     # Copy *canvas* to self, yielding a block with *src* value and *dst* value that will
     # determine how the values are blended
+    # - src_rect is scaled to dst_rect
     def draw(canvas : Canvas(T), src_rect : Rect(Number), dst_rect : Rect(Number), &)
-      src_rect.map_points(dst_rect) do |src, dst|
+      scale = src_rect.size / dst_rect.size
+      dst_clip = (dst_rect.intersection?(self.rect) || dst_rect).to_f64
+      src_clip = src_rect.to_f64
+
+      if dst_rect.top_left.x < 0
+        src_clip.top_left.x = -(dst_rect.top_left.x * scale.x)
+      end
+
+      if dst_rect.top_left.y < 0
+        src_clip.top_left.y = -(dst_rect.top_left.y * scale.y)
+      end
+
+      src_clip.map_points(dst_clip, scale) do |src, dst|
         if source_color = canvas[src]?
           if dest_color = self[dst]?
             self[dst] = yield(source_color, dest_color)
@@ -63,8 +76,9 @@ module PF2d
       end
     end
 
-    def draw(canvas  : Canvas(T), pos : Vec = Vec[0, 0], &)
-      canvas.each_point do |src|
+    def draw(canvas  : Canvas(T), pos : Vec = Vec[0, 0], src_rect : Rect(Number)? = nil, &)
+      src_rect ||= canvas.rect
+      src_rect.each do |src|
         dst = pos + src
         if source_color = canvas[src]?
           if dest_color = self[dst]?
@@ -76,17 +90,13 @@ module PF2d
       end
     end
 
-    def draw(canvas  : Canvas(T), pos : Vec = Vec[0, 0])
+    def draw(canvas : Canvas(T), pos : Vec = Vec[0, 0])
       draw(canvas, pos) { |src, dst| src }
     end
 
-    def draw(canvas  : Canvas(T), src_rect : Rect(Number), pos : Vec = Vec[0, 0], &blend)
-      draw(Clip.new(src_rect, canvas), pos, &blend)
-    end
-
-    def draw(canvas  : Canvas(T), src_rect : Rect(Number), pos : Vec = Vec[0, 0])
+    def draw(canvas : Canvas(T), pos : Vec = Vec[0, 0], src_rect : Rect(Number)? = nil)
       # Just return source value if no block given (this will overwrite the entire rect)
-      draw(canvas, src_rect, pos) { |src, dst| src }
+      draw(canvas, pos, src_rect) { |src, dst| src }
     end
 
     def clip(rect : Rect)

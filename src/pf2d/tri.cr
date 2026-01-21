@@ -19,6 +19,14 @@ module PF2d
     def initialize(@p1 : Vec2(T), @p2 : Vec2(T), @p3 : Vec2(T))
     end
 
+    def points
+      {@p1, @p2, @p3}
+    end
+
+    def point_pointers
+      {pointerof(@p1), pointerof(@p2), pointerof(@p3)}
+    end
+
     {% for op in %w[* / // + - % **] %}
       # Applies `{{op.id}}` to all component of this Vec with the corresponding component of *other*
       def {{ op.id }}(vec : Vec2)

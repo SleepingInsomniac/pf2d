@@ -1,12 +1,4 @@
 module PF2d
-  # struct PV
-  #   getter uv : Vec2(Float64)
-  #   getter q  : Float64
-  #
-  #   def initialize(@uv, @q)
-  #   end
-  # end
-
   struct Tri(T)
     macro [](*args)
       PF2d::Tri.new({{args.splat}})

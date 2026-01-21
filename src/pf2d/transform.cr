@@ -167,5 +167,13 @@ module PF2d
     def apply(point : PF2d::Vec)
       apply(point.x, point.y)
     end
+
+    def apply(points : Enumerable(PF2d::Vec))
+      points.map { |p| apply(p) }
+    end
+
+    def apply(points : Enumerable(PF2d::Vec), &)
+      points.each { |p| yield(apply(p)) }
+    end
   end
 end

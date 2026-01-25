@@ -1,9 +1,12 @@
 module PF2d
   class Transform
-    property matrix : Matrix(Float64, 9)
+    Matrix.define(3, 3)
+    Mat3x3.define_mul(3)
+
+    property matrix : Mat3x3(Float64)
 
     def self.identity
-      PF2d::Matrix[
+      Mat3x3[
         1.0, 0.0, 0.0,
         0.0, 1.0, 0.0,
         0.0, 0.0, 1.0,
@@ -12,7 +15,7 @@ module PF2d
 
     # Returns a matrix representing a 2d translation
     def self.translation(x : Number, y : Number)
-      PF2d::Matrix[
+      Mat3x3[
         1.0, 0.0, x.to_f64,
         0.0, 1.0, y.to_f64,
         0.0, 0.0, 1.0,
@@ -21,7 +24,7 @@ module PF2d
 
     # Returns a matrix representing a 2d scaling
     def self.scale(x : Number, y : Number)
-      PF2d::Matrix[
+      Mat3x3[
         x.to_f64, 0.0, 0.0,
         0.0, y.to_f64, 0.0,
         0.0, 0.0, 1.0,
@@ -32,7 +35,7 @@ module PF2d
     def self.rotation(angle : Number)
       cos = Math.cos(angle)
       sin = Math.sin(angle)
-      PF2d::Matrix[
+      Mat3x3[
         cos, -sin, 0.0,
         sin, cos, 0.0,
         0.0, 0.0, 1.0,
@@ -41,33 +44,37 @@ module PF2d
 
     # Returns a matrix representing a 2d shear
     def self.shear(x : Number, y : Number)
-      PF2d::Matrix[
+      Mat3x3[
         1.0, x.to_f64, 0.0,
         y.to_f64, 1.0, 0.0,
         0.0, 0.0, 1.0,
       ]
     end
 
+    # def self.planar(src : Quad, dst : Quad)
+    #   m8 = Mat8x8(Float64).new
+    # end
+
     # Return a new inverted version of the given *matrix*
-    def self.invert(matrix : PF2d::Matrix)
-      det = matrix[0, 0] * (matrix[1, 1] * matrix[2, 2] - matrix[1, 2] * matrix[2, 1]) -
-            matrix[1, 0] * (matrix[0, 1] * matrix[2, 2] - matrix[2, 1] * matrix[0, 2]) +
-            matrix[2, 0] * (matrix[0, 1] * matrix[1, 2] - matrix[1, 1] * matrix[0, 2])
+    def self.invert(matrix : Mat3x3)
+      det = matrix[0, 0] * (matrix[1, 1] * matrix[2, 2] - matrix[2, 1] * matrix[1, 2]) -
+            matrix[0, 1] * (matrix[1, 0] * matrix[2, 2] - matrix[1, 2] * matrix[2, 0]) +
+            matrix[0, 2] * (matrix[1, 0] * matrix[2, 1] - matrix[1, 1] * matrix[2, 0])
 
       idet = 1.0 / det
 
-      PF2d::Matrix[
-        (matrix[1, 1] * matrix[2, 2] - matrix[1, 2] * matrix[2, 1]) * idet,
-        (matrix[2, 0] * matrix[1, 2] - matrix[1, 0] * matrix[2, 2]) * idet,
-        (matrix[1, 0] * matrix[2, 1] - matrix[2, 0] * matrix[1, 1]) * idet,
-
-        (matrix[2, 1] * matrix[0, 2] - matrix[0, 1] * matrix[2, 2]) * idet,
-        (matrix[0, 0] * matrix[2, 2] - matrix[2, 0] * matrix[0, 2]) * idet,
-        (matrix[0, 1] * matrix[2, 0] - matrix[0, 0] * matrix[2, 1]) * idet,
-
+      Mat3x3[
+        (matrix[1, 1] * matrix[2, 2] - matrix[2, 1] * matrix[1, 2]) * idet,
+        (matrix[0, 2] * matrix[2, 1] - matrix[0, 1] * matrix[2, 2]) * idet,
         (matrix[0, 1] * matrix[1, 2] - matrix[0, 2] * matrix[1, 1]) * idet,
-        (matrix[0, 2] * matrix[1, 0] - matrix[0, 0] * matrix[1, 2]) * idet,
-        (matrix[0, 0] * matrix[1, 1] - matrix[0, 1] * matrix[1, 0]) * idet,
+
+        (matrix[1, 2] * matrix[2, 0] - matrix[1, 0] * matrix[2, 2]) * idet,
+        (matrix[0, 0] * matrix[2, 2] - matrix[0, 2] * matrix[2, 0]) * idet,
+        (matrix[1, 0] * matrix[0, 2] - matrix[0, 0] * matrix[1, 2]) * idet,
+
+        (matrix[1, 0] * matrix[2, 1] - matrix[2, 0] * matrix[1, 1]) * idet,
+        (matrix[2, 0] * matrix[0, 1] - matrix[0, 0] * matrix[2, 1]) * idet,
+        (matrix[0, 0] * matrix[1, 1] - matrix[1, 0] * matrix[0, 1]) * idet,
       ]
     end
 
@@ -160,8 +167,16 @@ module PF2d
     end
 
     def apply(x : Number, y : Number)
-      result = PF2d::Vec[x.to_f, y.to_f, 1.0] * @matrix
-      PF2d::Vec[result.x, result.y]
+      v = PF2d::Vec[x.to_f, y.to_f, 1.0]
+      x2 = @matrix[0, 0] * v.x + @matrix[0, 1] * v.y + @matrix[0, 2] * v.z
+      y2 = @matrix[1, 0] * v.x + @matrix[1, 1] * v.y + @matrix[1, 2] * v.z
+      w  = @matrix[2, 0] * v.x + @matrix[2, 1] * v.y + @matrix[2, 2] * v.z
+
+      # if w.abs <= 1e-12 || w.nan?
+      #   raise ArgumentError.new("Transform.apply produced invalid w=#{w} for point (#{x}, #{y}); matrix=#{@matrix}")
+      # end
+
+      PF2d::Vec[x2 / w, y2 / w]
     end
 
     def apply(point : PF2d::Vec)

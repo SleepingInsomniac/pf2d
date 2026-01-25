@@ -2,6 +2,9 @@ require "../spec_helper"
 
 include PF2d
 
+Matrix.define(2, 2)
+Matrix.define(3, 3)
+
 describe Vec do
   describe ".from_angle" do
     it "returns the correct normalized vector" do
@@ -114,12 +117,12 @@ describe Vec do
   describe "Matrix multiplication" do
     it "returns the scaled value when multiplied by an identity matrix" do
       v = Vec[1, 2]
-      m = Matrix[
+      m = Mat2x2[
         1, 0,
         0, 1,
       ]
       (v * m).should eq(v)
-      m = Matrix[
+      m = Mat2x2[
         2, 0,
         0, 1,
       ]
@@ -128,7 +131,7 @@ describe Vec do
 
     it "multiplies correctly" do
       v = Vec[2, 1, 3]
-      m = Matrix[
+      m = Mat3x3[
         1, 2, 3,
         4, 5, 6,
         7, 8, 9,

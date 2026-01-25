@@ -176,7 +176,7 @@ module PF2d
       # ```
       def *(matrix : Matrix)
         PF2d::Vec[{% for row in 0...i %}
-          {% for col in 0...i %} @{{ vars[col].id }} * matrix[{{col}}, {{row}}] {% if col != i - 1 %} + {% end %}{% end %},
+          {% for col in 0...i %} matrix[{{row}}, {{col}}] * @{{ vars[col].id }} {% if col < i - 1 %} + {% end %}{% end %},
         {% end %}]
       end
 

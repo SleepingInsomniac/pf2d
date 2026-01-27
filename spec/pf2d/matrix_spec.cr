@@ -3,6 +3,7 @@ require "../spec_helper"
 include PF2d
 
 Matrix.define(2, 2)
+Matrix.define(3, 2)
 Matrix.define(4, 4)
 
 describe Matrix do
@@ -134,6 +135,22 @@ describe Matrix do
         6, 5, 4,
         9, 8, 7,
       ])
+    end
+  end
+
+  describe "#solve?" do
+    it "solves a simple 2x2 system with debug output" do
+      m = Mat3x2[
+        1.0, 1.0, 3.0,
+        1.0, -1.0, 1.0,
+      ]
+
+      if r = m.solve?
+        r[0].should be_close(2.0, 1e-9)
+        r[1].should be_close(1.0, 1e-9)
+      else
+        raise "unable to solve system"
+      end
     end
   end
 end

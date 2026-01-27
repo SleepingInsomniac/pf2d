@@ -82,16 +82,17 @@ module PF2d
         end
       end
 
+      rhs = W - 1
+
       result = StaticArray(Float64, H).new(0.0)
 
-      (unknowns - 1).downto(0) do |i|
+      (H - 1).downto(0) do |i|
         sum = 0.0
-        (i + 1).upto(unknowns - 1) do |j|
+        (i + 1).upto(H - 1) do |j|
           sum += self[i, j] * result[j]
         end
 
-        return nil if self[i, i].abs < 1e-9
-        result[i] = (self[i, unknowns] - sum) / self[i, i]
+        result[i] = (self[i, rhs] - sum) / self[i, i]
       end
 
       result

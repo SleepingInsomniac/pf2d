@@ -2,6 +2,7 @@ module PF2d
   class Transform
     Matrix.define(3, 3)
     Mat3x3.define_mul(3)
+    Matrix.define(9, 8)
 
     property matrix : Mat3x3(Float64)
 
@@ -51,9 +52,49 @@ module PF2d
       ]
     end
 
-    # def self.planar(src : Quad, dst : Quad)
-    #   m8 = Mat8x8(Float64).new
-    # end
+    # https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html
+    def self.planar_perspective(src : Quad, dst : Quad)
+      m = Mat9x8(Float64).new
+      src_pts = src.points
+      dst_pts = dst.points
+      row = 0
+      0.upto(3) do |i|
+        x, y = src_pts[i].x, src_pts[i].y
+        u, v = dst_pts[i].x, dst_pts[i].y
+
+        m[row, 0] = x
+        m[row, 1] = y
+        m[row, 2] = 1.0
+        m[row, 3] = 0.0
+        m[row, 4] = 0.0
+        m[row, 5] = 0.0
+        m[row, 6] = -x * u
+        m[row, 7] = -y * u
+        m[row, 8] = u
+        row += 1
+
+        m[row, 0] = 0.0
+        m[row, 1] = 0.0
+        m[row, 2] = 0.0
+        m[row, 3] = x
+        m[row, 4] = y
+        m[row, 5] = 1.0
+        m[row, 6] = -x * v
+        m[row, 7] = -y * v
+        m[row, 8] = v
+        row += 1
+      end
+
+      if r = m.solve?
+        Mat3x3[
+          r[0], r[1], r[2],
+          r[3], r[4], r[5],
+          r[6], r[7], 1.0,
+        ]
+      else
+        identity
+      end
+    end
 
     # Return a new inverted version of the given *matrix*
     def self.invert(matrix : Mat3x3)
@@ -61,6 +102,7 @@ module PF2d
             matrix[0, 1] * (matrix[1, 0] * matrix[2, 2] - matrix[1, 2] * matrix[2, 0]) +
             matrix[0, 2] * (matrix[1, 0] * matrix[2, 1] - matrix[1, 1] * matrix[2, 0])
 
+      return identity if det.abs < 1e-9
       idet = 1.0 / det
 
       Mat3x3[
@@ -143,6 +185,11 @@ module PF2d
     # ditto
     def shear(point : PF2d::Vec)
       shear(point.x, point.y)
+    end
+
+    def distort(src : Quad, dst : Quad)
+      @matrix = Transform.planar_perspective(src, dst) * @matrix
+      self
     end
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

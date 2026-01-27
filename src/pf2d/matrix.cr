@@ -50,6 +50,7 @@ module PF2d
     end
 
     # Gaussian elimination
+    # https://www.geeksforgeeks.org/dsa/gaussian-elimination/
     def solve?
       unknowns = W - 1
       rhs = W - 1

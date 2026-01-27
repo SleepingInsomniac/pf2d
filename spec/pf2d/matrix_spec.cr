@@ -102,4 +102,38 @@ describe Matrix do
       (m1 == m3).should eq(false)
     end
   end
+
+  describe "#swap_rows" do
+    it "swaps the given rows" do
+      m = Mat3x3[
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+      ]
+
+      m.swap_rows(0, 2)
+      m.should eq(Mat3x3[
+        7, 8, 9,
+        4, 5, 6,
+        1, 2, 3,
+      ])
+    end
+  end
+
+  describe "#swap_row" do
+    it "swaps the given rows" do
+      m = Mat3x3[
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+      ]
+
+      m.swap_cols(0, 2)
+      m.should eq(Mat3x3[
+        3, 2, 1,
+        6, 5, 4,
+        9, 8, 7,
+      ])
+    end
+  end
 end

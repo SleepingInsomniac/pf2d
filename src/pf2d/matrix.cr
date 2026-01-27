@@ -62,6 +62,31 @@ module PF2d
       io << "\n]"
     end
 
+    def swap_rows(r1, r2)
+      (0...W).each do |col|
+        self[r1, col], self[r2, col] = self[r2, col], self[r1, col]
+      end
+    end
+
+    def swap_cols(c1, c2)
+      (0...H).each do |row|
+        self[row, c1], self[row, c2] = self[row, c2], self[row, c1]
+      end
+    end
+
+    def to_s(io)
+      max_len = max.to_s.size
+      io << {{@type.stringify}} << "[\n"
+      {% for r in 0...H %}
+        io << "  "
+        {% for c in 0...W %}
+          io << @data[{{ r * W + c }}].to_s.rjust(max_len) {% if c < W - 1 %} << ", " {% end %}
+        {% end %}
+        {% if r < H - 1 %} io << "\n" {% end %}
+      {% end %}
+      io << "\n]"
+    end
+
     macro define_mul(w)
       struct ::PF2d::Mat{{W}}x{{H}}(T)
         def *(other : ::PF2d::Mat{{w}}x{{W}})

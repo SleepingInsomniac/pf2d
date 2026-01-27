@@ -46,7 +46,7 @@ module PF2d
       max_y = {p1,p2,p3,p4}.map(&.y).max
 
       tl = Vec[min_x, min_y]
-      sz = Vec[max_x, max_y] - tl
+      sz = Vec[max_x, max_y] - tl + 1
 
       Rect[tl, sz]
     end

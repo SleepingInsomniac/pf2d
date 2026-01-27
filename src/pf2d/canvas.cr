@@ -19,6 +19,10 @@ module PF2d
       Rect[Vec[0, 0], size.to_i32]
     end
 
+    def quad
+      Quad[Vec[0, 0], Vec[size.x.to_i32 - 1, 0], size.to_i32 - 1, Vec[0, size.y.to_i32 - 1]]
+    end
+
     def in_bounds?(x, y)
       x >= 0 && y >= 0 && x < width && y < height
     end

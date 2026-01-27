@@ -49,17 +49,52 @@ module PF2d
       @data[row * W + col] = value
     end
 
-    def to_s(io)
-      max_len = max.to_s.size
-      io << {{@type.stringify}} << "[\n"
-      {% for r in 0...H %}
-        io << "  "
-        {% for c in 0...W %}
-          io << @data[{{ r * W + c }}].to_s.rjust(max_len) {% if c < W - 1 %} << ", " {% end %}
-        {% end %}
-        {% if r < H - 1 %} io << "\n" {% end %}
-      {% end %}
-      io << "\n]"
+    # Gaussian elimination
+    def solve?
+      unknowns = W - 1
+      rhs = W - 1
+
+      0.upto(unknowns - 1) do |k|
+        pivot_row = k
+        max_val = self[k, k].abs
+
+        (k + 1).upto(H - 1) do |i|
+          v = self[i, k].abs
+          if v > max_val
+            max_val = v
+            pivot_row = i
+          end
+        end
+
+        return nil if max_val.abs < 1e-9
+
+        swap_rows(k, pivot_row) if pivot_row != k
+
+        # Eliminate rows below
+        (k + 1).upto(H - 1) do |i|
+          factor = self[i, k] / self[k, k]
+
+          (k + 1).upto(W - 1) do |j|
+            self[i, j] = self[i, j] - factor * self[k, j]
+          end
+
+          self[i, k] = 0.0
+        end
+      end
+
+      result = StaticArray(Float64, H).new(0.0)
+
+      (unknowns - 1).downto(0) do |i|
+        sum = 0.0
+        (i + 1).upto(unknowns - 1) do |j|
+          sum += self[i, j] * result[j]
+        end
+
+        return nil if self[i, i].abs < 1e-9
+        result[i] = (self[i, unknowns] - sum) / self[i, i]
+      end
+
+      result
     end
 
     def swap_rows(r1, r2)

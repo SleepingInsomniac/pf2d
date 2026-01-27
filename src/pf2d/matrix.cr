@@ -41,12 +41,12 @@ module PF2d
 
     @[AlwaysInline]
     def [](row : Int, col : Int)
-      @data[row * {{ W }} + col]
+      @data[row * W + col]
     end
 
     @[AlwaysInline]
     def []=(row : Int, col : Int, value : T)
-      @data[row * {{ H }} + col] = value
+      @data[row * W + col] = value
     end
 
     def to_s(io)

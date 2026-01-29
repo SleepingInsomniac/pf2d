@@ -58,6 +58,12 @@ module PF2d
       }
     end
 
+    {% for op in %w[* / // + - % **] %}
+      def {{ op.id }}(val)
+        Quad[@p1 {{op.id}} val, @p2 {{op.id}} val, @p3 {{op.id}} val, @p4 {{op.id}} val]
+      end
+    {% end %}
+
     # TODO
     # def map_points(other : Quad)
     # end

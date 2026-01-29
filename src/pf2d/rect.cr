@@ -58,7 +58,7 @@ module PF2d
     end
 
     def top_right
-      top_left + Vec[size.x, T.new(0)]
+      top_left + Vec[size.x - 1, T.new(0)]
     end
 
     def bottom_right

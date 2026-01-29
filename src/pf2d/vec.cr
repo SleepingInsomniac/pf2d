@@ -200,6 +200,10 @@ module PF2d
         Vec{{i}}(Float64).new({% for arg in 0...i %} @{{vars[arg].id}}.to_f64.round(precision), {% end %})
       end
 
+      def floor
+        Vec[{{ vars[0...i].map { |v| "@#{v.id}.floor" }.join(", ").id }}]
+      end
+
       def to(type)
         Vec[{% for arg in 0...i %} type.new(@{{vars[arg].id}}), {% end %}]
       end

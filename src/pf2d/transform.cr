@@ -219,10 +219,6 @@ module PF2d
       y2 = @matrix[1, 0] * v.x + @matrix[1, 1] * v.y + @matrix[1, 2] * v.z
       w  = @matrix[2, 0] * v.x + @matrix[2, 1] * v.y + @matrix[2, 2] * v.z
 
-      # if w.abs <= 1e-12 || w.nan?
-      #   raise ArgumentError.new("Transform.apply produced invalid w=#{w} for point (#{x}, #{y}); matrix=#{@matrix}")
-      # end
-
       PF2d::Vec[x2 / w, y2 / w]
     end
 

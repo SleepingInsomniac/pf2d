@@ -67,7 +67,7 @@ module PF2d
           end
         end
 
-        return nil if max_val.abs < 1e-9
+        return nil if max_val.abs < EPS
 
         swap_rows(k, pivot_row) if pivot_row != k
 

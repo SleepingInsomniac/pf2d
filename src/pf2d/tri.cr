@@ -32,7 +32,7 @@ module PF2d
       v2 = p - p1
       denom = v0.det(v1)
 
-      return nil if denom.abs <= 1e-12 # no surface area
+      return nil if denom.abs <= EPS # no surface area
 
       u = v2.det(v1) / denom
       v = v0.det(v2) / denom
@@ -71,10 +71,10 @@ module PF2d
           next if w.nil?
 
           b0, b1, b2 = w
-          next if b0 < -1e-9 || b1 < -1e-9 || b2 < -1e-9
+          next if b0 < -EPS || b1 < -EPS || b2 < -EPS
 
           q  = b0 * q0 + b1 * q1 + b2 * q2
-          next if q.abs <= 1e-18
+          next if q.abs <= EPS
 
           sp_num =
             (dest.p1 * (b0 * q0)) +

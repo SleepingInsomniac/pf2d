@@ -1,5 +1,6 @@
 module PF2d
   VERSION = {% `shards version`.chomp.stringify %}
+  EPS = 1e-9
 
   def self.degrees_to_radians(degrees : Float)
     degrees * Math::PI / 180.0

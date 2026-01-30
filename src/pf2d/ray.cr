@@ -30,7 +30,7 @@ module PF2d
 
     def intersect?(other)
       denominator = @dir.det(other.dir)
-      return nil if denominator.abs <= 1e-9
+      return nil if denominator.abs <= EPS
 
       offset = other.pos - @pos
 

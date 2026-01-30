@@ -124,7 +124,7 @@ module PF2d
       offset = other.p1 - @p1
       denominator = d1.det(d2)
 
-      return nil if denominator.abs <= 1e-9
+      return nil if denominator.abs <= EPS
 
       t = offset.det(d2) / denominator
       u = offset.det(d1) / denominator
@@ -140,7 +140,7 @@ module PF2d
       d1, d2 = direction, other.direction
       denominator = d1.det(d2)
 
-      return nil if denominator.abs <= 1e-9
+      return nil if denominator.abs <= EPS
 
       p = d2 * @p2.det(@p1) - d1 * other.p2.det(other.p1)
       p / denominator

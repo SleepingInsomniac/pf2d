@@ -145,11 +145,5 @@ module PF2d
       p = d2 * @p2.det(@p1) - d1 * other.p2.det(other.p1)
       p / denominator
     end
-
-    # Return the point where the two lines would intersect unless parallel
-    @[Deprecated("Use #intersect?")]
-    def intersects?(other : Line(T))
-      intersect?(other)
-    end
   end
 end

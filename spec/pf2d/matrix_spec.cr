@@ -146,8 +146,8 @@ describe Matrix do
       ]
 
       if r = m.solve?
-        r[0].should be_close(2.0, 1e-9)
-        r[1].should be_close(1.0, 1e-9)
+        r[0].should be_close(2.0, EPS)
+        r[1].should be_close(1.0, EPS)
       else
         raise "unable to solve system"
       end

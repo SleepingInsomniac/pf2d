@@ -11,8 +11,8 @@ describe Ray do
       p = a.intersect?(b)
 
       p.should_not be_nil
-      p.not_nil!.x.should be_close(5.0, 1e-6)
-      p.not_nil!.y.should be_close(0.0, 1e-6)
+      p.not_nil!.x.should be_close(5.0, EPS)
+      p.not_nil!.y.should be_close(0.0, EPS)
     end
 
     it "returns nil when intersection is behind the ray" do

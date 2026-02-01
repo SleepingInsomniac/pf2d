@@ -6,7 +6,7 @@ module PF2d
     # PF2d::Vec[1, 2] # => PF2d::Vec2(Int32)(@x=1, @y=2)
     # ```
     macro [](*args)
-      PF2d::Vec{{args.size}}(typeof({{args.splat}})).new({{args.splat}})
+      PF2d::Vec{{args.size}}.new({{args.splat}})
     end
 
     def self.from_angle(degrees : Number)
@@ -22,6 +22,15 @@ module PF2d
     {% vars = %w[x y z w] %}
     struct Vec{{i}}(T) < Vec
       include Comparable(Vec{{i}})
+
+      # Creates a new `Vec` with the given *args*
+      #
+      # ```
+      # PF2d::Vec[1, 2] # => PF2d::Vec2(Int32)(@x=1, @y=2)
+      # ```
+      def self.[](*args)
+        new(*args)
+      end
 
       {% for arg in 0...i %}
         property {{vars[arg].id}} : T

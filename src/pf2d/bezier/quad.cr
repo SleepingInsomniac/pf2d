@@ -32,14 +32,12 @@ module PF2d
         b = -2.0 * p0 + 2.0 * p1
         c = p0
 
-        epsilon = 1e-8
-
-        if a.abs < epsilon
+        if a.abs < EPS
           # Linear case: a is approximately zero
-          if b.abs < epsilon
+          if b.abs < EPS
             # Degenerate case: both a and b are approximately zero
             # No solution unless c is also approximately zero
-            yield 0.0 if c.abs < epsilon
+            yield 0.0 if c.abs < EPS
           else
             # Solve linear equation b * t + c = 0
             t = -c / b
@@ -49,11 +47,11 @@ module PF2d
           # Quadratic case
           discriminant = b ** 2 - 4.0 * a * c
 
-          if discriminant.abs < epsilon
+          if discriminant.abs < EPS
             # One real root
             t = -b / (2.0 * a)
             yield t if t >= 0.0 && t <= 1.0
-          elsif discriminant > epsilon
+          elsif discriminant > EPS
             # Two real roots
             sqrt_discriminant = Math.sqrt(discriminant)
             t1 = (-b + sqrt_discriminant) / (2.0 * a)

@@ -1,6 +1,4 @@
 module PF2d::Drawable(T)
-  EPSILON = 1e-6
-
   record Intercept, x : Float64, d : PF2d::Vec2(Float64)
   @tbt = PF2d::ThreadedBinaryTree(Intercept).new { |v1, v2| v1.x > v2.x ? 1 : -1 }
   @intercept_group = [] of Intercept
@@ -47,8 +45,8 @@ module PF2d::Drawable(T)
         if intercept.x == current_intercept.x
           @intercept_group << intercept # Accumulate same x values into a group to evaluate the winding
         else
-          winding += 1 if @intercept_group.any? { |i| i.d.y < -EPSILON } && @intercept_group.none? { |i| i.d.y > 0 }
-          winding -= 1 if @intercept_group.any? { |i| i.d.y > EPSILON } && @intercept_group.none? { |i| i.d.y < 0 }
+          winding += 1 if @intercept_group.any? { |i| i.d.y < -EPS } && @intercept_group.none? { |i| i.d.y > 0 }
+          winding -= 1 if @intercept_group.any? { |i| i.d.y > EPS } && @intercept_group.none? { |i| i.d.y < 0 }
 
           x1 = current_intercept.x
           x2 = (intercept.x - current_intercept.x)

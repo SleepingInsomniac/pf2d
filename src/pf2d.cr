@@ -7,6 +7,7 @@ module PF2d
   end
 end
 
+require "./pf2d/points"
 require "./pf2d/matrix"
 require "./pf2d/vec"
 require "./pf2d/transform"

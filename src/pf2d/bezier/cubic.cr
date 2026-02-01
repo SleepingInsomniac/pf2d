@@ -55,7 +55,7 @@ module PF2d
         c = -3 * p0 + 3 * p1
         d = p0
 
-        epsilon = 1e-8
+        epsilon = EPS
 
         if a.abs < epsilon
           # Quadratic case

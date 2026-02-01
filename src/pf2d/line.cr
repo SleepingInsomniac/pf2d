@@ -1,26 +1,8 @@
 module PF2d
   # Represents a line between two points
-  # `Line(Vec(Int32, 2))`
+  # `Line(Vec2(Int32))`
   #
-  struct Line(T)
-    macro [](*args)
-      PF2d::Line.new({{args.splat}})
-    end
-
-    property p1 : T, p2 : T
-
-    def initialize(@p1, @p2)
-    end
-
-    def initialize(x1, y1, x2, p2)
-      @p1 = Vec[x1, y1]
-      @p2 = Vec[x2, y2]
-    end
-
-    def point_pointers
-      {pointerof(@p1), pointerof(@p2)}
-    end
-
+  struct Line(T) < Points(2)
     # The height from the starting point to the ending point
     #
     def rise
@@ -41,22 +23,6 @@ module PF2d
     def inv_slope
       return 0.0 if rise == 0
       run / rise
-    end
-
-    def left
-      @p1.x < @p2.x ? @p1.x : @p2.x
-    end
-
-    def right
-      @p1.x > @p2.x ? @p1.x : @p2.x
-    end
-
-    def top
-      @p1.y > @p2.y ? @p2.y : @p1.y
-    end
-
-    def bottom
-      @p1.y > @p2.y ? @p1.y : @p2.y
     end
 
     def contains_y?(y)
@@ -89,10 +55,6 @@ module PF2d
       Math.sqrt(((@p2 - @p1) ** 2).sum)
     end
 
-    def /(n : (Float | Int))
-      Line.new(@p1 / n, @p2 / n)
-    end
-
     # Convert this line into a normalized vector
     def to_vector
       direction.normalized
@@ -110,12 +72,6 @@ module PF2d
     # Normal counter clockwise
     def normal_cc
       Vec[rise, -run].normalized
-    end
-
-    def rect
-      tl = Vec[left, top]
-      br = Vec[right, bottom]
-      Rect[tl, br - tl]
     end
 
     # Return the point where the two lines intersect unless parallel

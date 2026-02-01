@@ -7,8 +7,10 @@ describe Canvas do
     canvas = TestCanvas.new(9, 9) { false }
     canvas.draw_curve(Bezier[Vec[0, 0], Vec[0, 10], Vec[10, 10], Vec[8, 0]], true)
     result = canvas.to_s
-    puts
-    puts result
+    display do
+      puts
+      puts result
+    end
     result.should eq(<<-GRID)
     ┌──────────────────┐
     │██              ██│
@@ -28,8 +30,10 @@ describe Canvas do
     canvas = TestCanvas.new(9, 9) { false }
     canvas.draw_circle(Vec[4, 4], 4, true)
     result = canvas.to_s
-    puts
-    puts result
+    display do
+      puts
+      puts result
+    end
     result.should eq(<<-GRID)
     ┌──────────────────┐
     │      ██████      │
@@ -49,8 +53,10 @@ describe Canvas do
     canvas = TestCanvas.new(10, 10) { false }
     canvas.draw_line(Vec[0, 0], Vec[9, 9], true)
     result = canvas.to_s
-    puts
-    puts result
+    display do
+      puts
+      puts result
+    end
     result.should eq(<<-GRID)
     ┌────────────────────┐
     │██                  │

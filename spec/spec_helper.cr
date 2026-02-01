@@ -1,6 +1,12 @@
 require "spec"
 require "../src/pf2d"
 
+macro display
+  {% if flag?(:visual) %}
+    {{ yield }}
+  {% end %}
+end
+
 module PF2d
   class TestCanvas < Grid(Bool)
     def to_s(io : IO)
@@ -22,5 +28,3 @@ PF2d::Matrix.define(3, 3)
 PF2d::Matrix.define(4, 4)
 PF2d::Mat2x2.define_mul(2)
 PF2d::Mat4x4.define_mul(4)
-
-

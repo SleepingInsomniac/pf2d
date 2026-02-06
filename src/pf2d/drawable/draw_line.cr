@@ -49,16 +49,19 @@ module PF2d::Drawable(T)
     draw_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y, color)
   end
 
+  # :ditto:
   def draw(line : PF2d::Line, color)
     draw_line(line, color)
   end
 
+  # :ditto:
   def draw_line(points : Enumerable(PF2d::Vec), color)
     points.each_cons(2) do |(p1, p2)|
       draw_line(p1, p2, color)
     end
   end
 
+  # :ditto:
   def draw(lines : Enumerable(PF2d::Line), color)
     lines.each do |line|
       draw_line(line, color)

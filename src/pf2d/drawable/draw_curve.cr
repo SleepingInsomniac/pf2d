@@ -1,6 +1,6 @@
 module PF2d::Drawable(T)
   def draw_curve(curve : Bezier::Curve, value : T, samples : Int = 100)
-    point = curve.p0
+    point = curve.p1
     0.upto(samples) do |x|
       t = x / samples
       next_point = curve.at(t)

@@ -46,13 +46,13 @@ module PF2d
       # Increase *steps* for accuracy
       def length(steps : UInt32 = 10)
         _length = 0.0
-        seg_p0 = Vec[@p0.x, @p0.y]
+        seg_p1 = Vec[@p1.x, @p1.y]
 
         0.upto(steps) do |n|
           t = n / steps
-          seg_p1 = at(t)
-          _length += seg_p0.distance(seg_p1)
-          seg_p0 = seg_p1
+          seg_p2 = at(t)
+          _length += seg_p1.distance(seg_p2)
+          seg_p1 = seg_p2
         end
         _length
       end

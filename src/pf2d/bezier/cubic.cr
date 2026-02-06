@@ -8,25 +8,25 @@ module PF2d
     # For information on the implementation see https://pomax.github.io/bezierinfo
     struct Cubic(T) < Curve(T)
       # Find the value at *t* along the curve (between 0.0 and 1.0)
-      def self.interpolate(t : Float64, p0 : Number, p1 : Number, p2 : Number, p3 : Number)
-        (1 - t) ** 3 * p0 + 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t ** 2 * p2 + t ** 3 * p3
+      def self.interpolate(t : Float64, p1 : Number, p2 : Number, p3 : Number, p4 : Number)
+        (1 - t) ** 3 * p1 + 3 * (1 - t) ** 2 * t * p2 + 3 * (1 - t) * t ** 2 * p3 + t ** 3 * p4
       end
 
       # The derivative represents the rate of change of the interpolation at *t*
-      def self.derivative(t : Float64, p0 : Number, p1 : Number, p2 : Number, p3 : Number)
-        3 * (1 - t) ** 2 * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t ** 2 * (p3 - p2)
+      def self.derivative(t : Float64, p1 : Number, p2 : Number, p3 : Number, p4 : Number)
+        3 * (1 - t) ** 2 * (p2 - p1) + 6 * (1 - t) * t * (p3 - p2) + 3 * t ** 2 * (p4 - p3)
       end
 
-      def self.second_derivative(t : Float64, p0 : Number, p1 : Number, p2 : Number, p3 : Number)
-        6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1)
+      def self.second_derivative(t : Float64, p1 : Number, p2 : Number, p3 : Number, p4 : Number)
+        6 * (1 - t) * (p3 - 2 * p2 + p1) + 6 * t * (p4 - 2 * p3 + p2)
       end
 
       # Find the values that lie at the extrema of the function, i.e. where the rate of change is 0
       # these points are typically at the edges of a 2d curve
-      def self.extrema(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
-        a = 3 * (-p0 + 3 * p1 - 3 * p2 + p3)
-        b = 6 * (p0 - 2 * p1 + p2)
-        c = 3 * (p1 - p0)
+      def self.extrema(p1 : Number, p2 : Number, p3 : Number, p4 : Number)
+        a = 3 * (-p1 + 3 * p2 - 3 * p3 + p4)
+        b = 6 * (p1 - 2 * p2 + p3)
+        c = 3 * (p2 - p1)
 
         if a == 0
           if b != 0
@@ -48,12 +48,12 @@ module PF2d
       end
 
       # Solves roots so that t = 0
-      def self.roots(p0 : Number, p1 : Number, p2 : Number, p3 : Number)
+      def self.roots(p1 : Number, p2 : Number, p3 : Number, p4 : Number)
         # Compute coefficients a, b, c, d
-        a = -p0 + 3 * p1 - 3 * p2 + p3
-        b = 3 * p0 - 6 * p1 + 3 * p2
-        c = -3 * p0 + 3 * p1
-        d = p0
+        a = -p1 + 3 * p2 - 3 * p3 + p4
+        b = 3 * p1 - 6 * p2 + 3 * p3
+        c = -3 * p1 + 3 * p2
+        d = p1
 
         epsilon = EPS
 
@@ -149,58 +149,58 @@ module PF2d
         end
       end
 
-      property p0 : Vec2(T)
       property p1 : Vec2(T)
       property p2 : Vec2(T)
       property p3 : Vec2(T)
+      property p4 : Vec2(T)
 
-      def initialize(@p0, @p1, @p2, @p3)
+      def initialize(@p1, @p2, @p3, @p4)
       end
 
       def point_pointers
-        {pointerof(@p0), pointerof(@p1), pointerof(@p2), pointerof(@p3)}
+        {pointerof(@p1), pointerof(@p2), pointerof(@p3), pointerof(@p4)}
       end
 
       def points
-        {@p0, @p1, @p2, @p3}
+        {@p1, @p2, @p3, @p4}
       end
 
       def control_points : Tuple(Vec2(T), Vec2(T))
-        {@p0, @p3}
+        {@p1, @p4}
       end
 
       # Split this cubic curve into two quadratic curves
       def to_quads
-        p01 = (@p0 + @p1) / 2
-        p12 = (@p1 + @p2) / 2
-        p23 = (@p2 + @p3) / 2
-        p012 = (p01 + p12) / 2
-        p123 = (p12 + p23) / 2
-        p0123 = (p012 + p123) / 2
+        p11 = (@p1 + @p2) / 2
+        p22 = (@p2 + @p3) / 2
+        p33 = (@p3 + @p4) / 2
+        p112 = (p11 + p22) / 2
+        p223 = (p22 + p33) / 2
+        p1123 = (p112 + p223) / 2
 
-        q0 = @p0
-        q1 = p01 * 0.75 + p012 * 0.75 - @p0 * 0.25 - p0123 * 0.25
-        q2 = p0123
+        q0 = @p1
+        q1 = p11 * 0.75 + p112 * 0.75 - @p1 * 0.25 - p1123 * 0.25
+        q2 = p1123
 
-        r0 = p0123
-        r1 = p123 * 0.75 + p23 * 0.75 - p0123 * 0.25 - @p3 * 0.25
-        r2 = @p3
+        r0 = p1123
+        r1 = p223 * 0.75 + p33 * 0.75 - p1123 * 0.25 - @p4 * 0.25
+        r2 = @p4
 
         {Quad.new(q0, q1, q2), Quad.new(r0, r1, r2)}
       end
 
       # Split this curve into two curves at *t*
       def split(t : Float64)
-        p01 = Line[@p0, @p1].lerp(t)
-        p12 = Line[@p1, @p2].lerp(t)
-        p23 = Line[@p2, @p3].lerp(t)
-        p012 = Line[p01, p12].lerp(t)
-        p123 = Line[p12, p23].lerp(t)
-        p0123 = Line[p012, p123].lerp(t)
+        p11 = Line[@p1, @p2].lerp(t)
+        p22 = Line[@p2, @p3].lerp(t)
+        p33 = Line[@p3, @p4].lerp(t)
+        p112 = Line[p11, p22].lerp(t)
+        p223 = Line[p22, p33].lerp(t)
+        p1123 = Line[p112, p223].lerp(t)
 
         {
-          Cubic.new(p0.to(T), p01.to(T), p012.to(T), p0123.to(T)),
-          Cubic.new(p0123.to(T), p123.to(T), p23.to(T), p3.to(T)),
+          Cubic.new(p1.to(T), p11.to(T), p112.to(T), p1123.to(T)),
+          Cubic.new(p1123.to(T), p223.to(T), p33.to(T), p4.to(T)),
         }
       end
     end

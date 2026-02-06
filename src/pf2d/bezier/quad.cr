@@ -1,21 +1,21 @@
 module PF2d
   module Bezier
     struct Quad(T) < Curve(T)
-      def self.interpolate(t : Float64, p0 : Number, p1 : Number, p2 : Number)
-        (1 - t) ** 2 * p0 + 2 * (1 - t) * t * p1 + t ** 2 * p2
+      def self.interpolate(t : Float64, p1 : Number, p2 : Number, p3 : Number)
+        (1 - t) ** 2 * p1 + 2 * (1 - t) * t * p2 + t ** 2 * p3
       end
 
-      def self.derivative(t : Float64, p0 : Number, p1 : Number, p2 : Number)
-        (-2 + 2 * t) * p0 + (2 - 4 * t) * p1 + 2 * t * p2
+      def self.derivative(t : Float64, p1 : Number, p2 : Number, p3 : Number)
+        (-2 + 2 * t) * p1 + (2 - 4 * t) * p2 + 2 * t * p3
       end
 
-      def self.second_derivative(p0 : Number, p1 : Number, p2 : Number)
-        2 * p0 - 4 * p1 + 2 * p2
+      def self.second_derivative(p1 : Number, p2 : Number, p3 : Number)
+        2 * p1 - 4 * p2 + 2 * p3
       end
 
-      def self.extrema(p0 : Number, p1 : Number, p2 : Number)
-        numerator = p0 - p1
-        denominator = p0 - 2 * p1 + p2
+      def self.extrema(p1 : Number, p2 : Number, p3 : Number)
+        numerator = p1 - p2
+        denominator = p1 - 2 * p2 + p3
         return if denominator == 0.0
 
         t_extrema = numerator / denominator
@@ -26,11 +26,11 @@ module PF2d
       end
 
       # Solves roots so that t = 0
-      def self.roots(p0 : Number, p1 : Number, p2 : Number)
+      def self.roots(p1 : Number, p2 : Number, p3 : Number)
         # Compute coefficients of the quadratic equation a*t^2 + b*t + c = 0
-        a = p0 - 2.0 * p1 + p2
-        b = -2.0 * p0 + 2.0 * p1
-        c = p0
+        a = p1 - 2.0 * p2 + p3
+        b = -2.0 * p1 + 2.0 * p2
+        c = p1
 
         if a.abs < EPS
           # Linear case: a is approximately zero
@@ -63,44 +63,44 @@ module PF2d
         end
       end
 
-      property p0 : Vec2(T)
       property p1 : Vec2(T)
       property p2 : Vec2(T)
+      property p3 : Vec2(T)
 
-      def initialize(@p0, @p1, @p2)
+      def initialize(@p1, @p2, @p3)
       end
 
       def initialize(x0 : T, y0 : T, x1 : T, y1 : T, x2 : T, y2 : T)
-        @p0 = Vec[x0, y0]
-        @p1 = Vec[x1, y1]
-        @p2 = Vec[x2, y2]
+        @p1 = Vec[x0, y0]
+        @p2 = Vec[x1, y1]
+        @p3 = Vec[x2, y2]
       end
 
       def point_pointers
-        {pointerof(@p0), pointerof(@p1), pointerof(@p2)}
+        {pointerof(@p1), pointerof(@p2), pointerof(@p3)}
       end
 
       def points
-        {@p0, @p1, @p2}
+        {@p1, @p2, @p3}
       end
 
       def control_point_pointers : Tuple(Vec2(T)*, Vec2(T)*)
-        {pointerof(@p0), pointerof(@p2)}
+        {pointerof(@p1), pointerof(@p3)}
       end
 
       def control_points : Tuple(Vec2(T), Vec2(T))
-        {@p0, @p2}
+        {@p1, @p3}
       end
 
       # Split this curve into two curves at *t*
       def split(t : Float64)
-        p01 = Line[@p0, @p1].lerp(t)
         p12 = Line[@p1, @p2].lerp(t)
-        p012 = Line[p01, p12].lerp(t)
+        p23 = Line[@p2, @p3].lerp(t)
+        p12_23 = Line[p12, p23].lerp(t)
 
         {
-          Quad.new(@p0.to(T), p01.to(T), p012.to(T)),
-          Quad.new(p012.to(T), p12.to(T), @p2.to(T)),
+          Quad.new(@p1.to(T), p12.to(T), p12_23.to(T)),
+          Quad.new(p1223.to(T), p23.to(T), @p3.to(T)),
         }
       end
     end

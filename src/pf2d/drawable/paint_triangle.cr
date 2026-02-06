@@ -1,6 +1,14 @@
 module PF2d::Drawable(T)
+  def paint_triangle(
+    p1 : PF2d::Vec3(Float), p2 : PF2d::Vec3(Float), p3 : PF2d::Vec3(Float),
+    t1 : PF2d::Vec, t2 : PF2d::Vec, t3 : PF2d::Vec,
+    texture : PF2d::Viewable(T)?, buffer : Drawable(Float), tint : T
+  )
+    paint_triangle(p1.to_i, p2.to_i, p3.to_i, t1, t2, t3, texture, buffer, tint)
+  end
+
   # Draw a textured triangle
-  def paint_triangle(p1 : PF2d::Vec, p2 : PF2d::Vec, p3 : PF2d::Vec, t1 : PF2d::Vec, t2 : PF2d::Vec, t3 : PF2d::Vec, texture : PF2d::Viewable(T)?, buffer : Drawable(Float), tint : T)
+  def paint_triangle(p1 : PF2d::Vec3(Int), p2 : PF2d::Vec3(Int), p3 : PF2d::Vec3(Int), t1 : PF2d::Vec, t2 : PF2d::Vec, t3 : PF2d::Vec, texture : PF2d::Viewable(T)?, buffer : Drawable(Float), tint : T)
     p1, p2, p3, t1, t2, t3 = sort_verticies(p1, p2, p3, t1, t2, t3)
 
     # z = (p1.z + p2.z + p3.z) // 3

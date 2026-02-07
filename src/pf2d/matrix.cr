@@ -49,56 +49,6 @@ module PF2d
       @data[row * W + col] = value
     end
 
-    # Gaussian elimination
-    # https://www.geeksforgeeks.org/dsa/gaussian-elimination/
-    def solve?
-      unknowns = W - 1
-      rhs = W - 1
-
-      0.upto(unknowns - 1) do |k|
-        pivot_row = k
-        max_val = self[k, k].abs
-
-        (k + 1).upto(H - 1) do |i|
-          v = self[i, k].abs
-          if v > max_val
-            max_val = v
-            pivot_row = i
-          end
-        end
-
-        return nil if max_val.abs < EPS
-
-        swap_rows(k, pivot_row) if pivot_row != k
-
-        # Eliminate rows below
-        (k + 1).upto(H - 1) do |i|
-          factor = self[i, k] / self[k, k]
-
-          (k + 1).upto(W - 1) do |j|
-            self[i, j] = self[i, j] - factor * self[k, j]
-          end
-
-          self[i, k] = 0.0
-        end
-      end
-
-      rhs = W - 1
-
-      result = StaticArray(Float64, H).new(0.0)
-
-      (H - 1).downto(0) do |i|
-        sum = 0.0
-        (i + 1).upto(H - 1) do |j|
-          sum += self[i, j] * result[j]
-        end
-
-        result[i] = (self[i, rhs] - sum) / self[i, i]
-      end
-
-      result
-    end
-
     def swap_rows(r1, r2)
       (0...W).each do |col|
         self[r1, col], self[r2, col] = self[r2, col], self[r1, col]
@@ -143,3 +93,5 @@ module PF2d
     end
   end
 end
+
+require "./matrix/solve"

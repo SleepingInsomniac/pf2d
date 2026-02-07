@@ -1,4 +1,12 @@
 module PF2d::Drawable(T)
+  # Sort points from top to bottom
+  private def sort_verticies(p1 : PF2d::Vec, p2 : PF2d::Vec, p3 : PF2d::Vec, t1 : PF2d::Vec, t2 : PF2d::Vec, t3 : PF2d::Vec)
+    p1, p2, t1, t2 = p2, p1, t2, t1 if p2.y < p1.y
+    p1, p3, t1, t3 = p3, p1, t3, t1 if p3.y < p1.y
+    p2, p3, t2, t3 = p3, p2, t3, t2 if p3.y < p2.y
+    {p1, p2, p3, t1, t2, t3}
+  end
+
   def paint_triangle(
     p1 : PF2d::Vec3(Float), p2 : PF2d::Vec3(Float), p3 : PF2d::Vec3(Float),
     t1 : PF2d::Vec, t2 : PF2d::Vec, t3 : PF2d::Vec,

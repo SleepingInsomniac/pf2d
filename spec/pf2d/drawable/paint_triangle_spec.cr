@@ -9,7 +9,7 @@ struct Rgb(T)
   end
 
   def to_s(io)
-    io << "██".colorize(@r, @g, @b)
+    io << (black? ? "  " : "██".colorize(@r, @g, @b))
   end
 
   def *(n : Number)
@@ -21,16 +21,20 @@ struct Rgb(T)
   end
 end
 
-def stringify(canvas)
-  String.build do |io|
+def stringify(canvas, colorize = false)
+  enabled = Colorize.enabled?
+  Colorize.enabled = colorize
+  result = String.build do |io|
     io << "┌" << "─" * canvas.width * 2 << "┐" << "\n"
     canvas.each_row do |row|
       io << "│"
-      row.map { |c| io << (c.black? ? "  " : "██") }
+      row.map { |c| io << c.to_s }
       io << "│\n"
     end
     io << "└" << "─" * canvas.width * 2 << "┘" << "\n"
   end
+  Colorize.enabled = enabled
+  result
 end
 
 describe PF2d::Drawable do
@@ -51,7 +55,7 @@ describe PF2d::Drawable do
 
       display do
         puts
-        puts stringify(canvas)
+        puts stringify(canvas, true)
       end
 
       stringify(canvas).chomp.should eq(<<-GRID)
@@ -86,7 +90,7 @@ describe PF2d::Drawable do
 
       display do
         puts
-        puts stringify(canvas)
+        puts stringify(canvas, true)
       end
 
       stringify(canvas).chomp.should eq(<<-GRID)
@@ -121,7 +125,7 @@ describe PF2d::Drawable do
 
       display do
         puts
-        puts stringify(canvas)
+        puts stringify(canvas, true)
       end
 
       stringify(canvas).chomp.should eq(<<-GRID)
@@ -139,5 +143,41 @@ describe PF2d::Drawable do
       └────────────────────┘
       GRID
     end
+
+    it "renders a left pointing triangle" do
+      canvas = PF2d::Grid(Rgb(UInt8)).new(10, 10) { Rgb(UInt8).new(0, 0, 0) }
+      depth_buffer = PF2d::Grid(Float64).new(10, 10) { 0.0 }
+
+      p1 = PF2d::Vec[9.0, 0.0, 0.0]
+      p2 = PF2d::Vec[0.0, 5.0, 0.0]
+      p3 = PF2d::Vec[7.0, 9.0, 0.0]
+
+      t1 = PF2d::Vec[0.0, 0.0, 1.0]
+      t2 = PF2d::Vec[1.0, 0.0, 1.0]
+      t3 = PF2d::Vec[0.0, 1.0, 1.0]
+
+      canvas.paint_triangle(p1, p2, p3, t1, t2, t3, nil, depth_buffer, Rgb(UInt8).new(0, 255, 255))
+
+      display do
+        puts
+        puts stringify(canvas, true)
+      end
+
+      stringify(canvas).chomp.should eq(<<-GRID)
+      ┌────────────────────┐
+      │                  ██│
+      │              ██████│
+      │          ██████████│
+      │        ██████████  │
+      │    ██████████████  │
+      │██████████████████  │
+      │    ██████████████  │
+      │        ████████    │
+      │          ██████    │
+      │              ██    │
+      └────────────────────┘
+      GRID
+    end
+
   end
 end

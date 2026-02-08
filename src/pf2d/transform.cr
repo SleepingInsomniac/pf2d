@@ -55,8 +55,9 @@ module PF2d
     # https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html
     def self.planar_perspective(src : Quad, dst : Quad)
       m = Mat9x8(Float64).new
-      src_pts = src.points
-      dst_pts = dst.points
+      # These may actually need to be extended by 1px "unit" in the direction of the line of the top edge, and right edge.
+      src_pts = { src.p1, src.p2 + Vec[1, 0], src.p3 + Vec[1, 1], src.p4 + Vec[0, 1] }
+      dst_pts = { dst.p1, dst.p2 + Vec[1, 0], dst.p3 + Vec[1, 1], dst.p4 + Vec[0, 1] }
       row = 0
       0.upto(3) do |i|
         x, y = src_pts[i].x, src_pts[i].y

@@ -8,7 +8,7 @@ describe PF2d::Drawable do
       canvas = TestGrid.new(9, 9)
       canvas.draw_circle(Vec[4, 4], 4, WHITE)
       result = canvas.to_s
-      display do
+      visual do
         puts
         puts result
       end

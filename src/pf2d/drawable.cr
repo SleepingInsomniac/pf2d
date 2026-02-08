@@ -6,6 +6,12 @@ module PF2d::Drawable(T)
     draw_point(point.x, point.y, value)
   end
 
+  # Blends a point onto *Drawable* - requires *Viewable*
+  def draw_point(point : PF2d::Vec, value : T, &blend : T, T -> T)
+    dst = get_point(point)
+    draw_point(point, blend.call(value, dst))
+  end
+
   def draw(point : PF2d::Vec, value : T)
     draw_point(point, value)
   end

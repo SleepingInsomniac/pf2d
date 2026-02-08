@@ -1,6 +1,6 @@
 module PF2d::Drawable(T)
-  # Draw a line using Bresenham’s Algorithm
-  def draw_line(x1 : Int, y1 : Int, x2 : Int, y2 : Int, color)
+  # Use Bresenham’s Algorithm to calculate points
+  def map_line(x1 : Int, y1 : Int, x2 : Int, y2 : Int)
     # The slope for each axis
     slope = PF2d::Vec[(x2 - x1).abs, -(y2 - y1).abs]
 
@@ -14,7 +14,7 @@ module PF2d::Drawable(T)
     point = PF2d::Vec[x1, y1]
 
     loop do
-      draw_point(point.x, point.y, color)
+      yield(point)
       # Break if we've reached the ending point
       break if point.x == x2 && point.y == y2
 
@@ -34,14 +34,26 @@ module PF2d::Drawable(T)
     end
   end
 
-  # :ditto:
+  # Draw a line using Bresenham’s Algorithm
   def draw_line(x1 : Number, y1 : Number, x2 : Number, y2 : Number, color)
-    draw_line(x1.to_i32, y1.to_i32, x2.to_i32, y2.to_i32, color)
+    map_line(x1.to_i, y1.to_i, x2.to_i, y2.to_i) do |point|
+      draw_point(point.x, point.y, color)
+    end
+  end
+
+  def draw_line(x1 : Number, y1 : Number, x2 : Number, y2 : Number, color, &blend : T, T -> T)
+    map_line(x1.to_i, y1.to_i, x2.to_i, y2.to_i) do |point|
+      draw_point(point, color, &blend)
+    end
   end
 
   # :ditto:
   def draw_line(p1 : PF2d::Vec, p2 : PF2d::Vec, color)
     draw_line(p1.x, p1.y, p2.x, p2.y, color)
+  end
+
+  def draw_line(p1 : PF2d::Vec, p2 : PF2d::Vec, color, &blend : T, T -> T)
+    draw_line(p1.x, p1.y, p2.x, p2.y, color, &blend)
   end
 
   # :ditto:
@@ -52,6 +64,10 @@ module PF2d::Drawable(T)
   # :ditto:
   def draw(line : PF2d::Line, color)
     draw_line(line, color)
+  end
+
+  def draw(line : PF2d::Line, color, &blend : T, T -> T)
+    draw_line(line.p1.x, line.p1.y, line.p2.x, line.p2.y, color, &blend)
   end
 
   # :ditto:
@@ -71,5 +87,9 @@ module PF2d::Drawable(T)
   # Draw a horizontal line of *width*
   def scan_line(x : Number, y : Number, width : Number, color)
     0.upto(width.to_i) { |n| draw_point(x + n, y, color) }
+  end
+
+  def scan_line(x : Number, y : Number, width : Number, color, &blend : T, T -> T)
+    0.upto(width.to_i) { |n| draw_point(Vec[x + n, y], color, &blend) }
   end
 end

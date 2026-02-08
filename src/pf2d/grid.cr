@@ -39,10 +39,11 @@ module PF2d
       def initialize(@data, @width, @height)
       end
 
-      def initialize(@width, @height)
+      def initialize(@width, @height, & : Vec2(Int32), Vec2(Int32) -> T)
+        s = size
         @data = {{t}}.new(@width * @height) do |i|
           y, x = i.divmod(@width)
-          yield(Vec[x, y], size)
+          yield Vec[x, y], s
         end
       end
     end

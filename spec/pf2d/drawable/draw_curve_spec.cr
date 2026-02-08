@@ -8,7 +8,7 @@ describe PF2d::Drawable do
       canvas = TestGrid.new(9, 9)
       canvas.draw_curve(Bezier[Vec[0, 0], Vec[0, 10], Vec[10, 10], Vec[8, 0]], WHITE)
       result = canvas.to_s
-      display do
+      visual do
         puts
         puts result
       end

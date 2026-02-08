@@ -1,5 +1,9 @@
 module PF2d
   abstract struct Matrix(T, W, H)
+    # Define a maxtrix with a given width and height:
+    # ```crystal
+    #   Matrix.define(3, 3) # => produces the PF2d::Mat3x3(T) struct constant
+    # ```
     macro define(width, height)
       {% unless PF2d.has_constant?("Mat#{width}x#{height}") %}
         struct ::PF2d::Mat{{width}}x{{height}}(T) < ::PF2d::Matrix(T, {{width}}, {{height}})
@@ -74,6 +78,12 @@ module PF2d
       io << "\n]"
     end
 
+    # This allows matrix multiplication for this matrix by another of *w* width
+    # ```crystal
+    #   PF2d::Matrix.define(3, 3) # => PF2d::Mat3x3(T)
+    #   PF2d::Mat3x3.define_mul(3) # Only define this once
+    #   PF2d::Mat3x3[...] * PF2d::Mat3x3[...] # => Mat3x3
+    # ```
     macro define_mul(w)
       struct ::PF2d::Mat{{W}}x{{H}}(T)
         def *(other : ::PF2d::Mat{{w}}x{{W}})

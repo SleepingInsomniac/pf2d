@@ -1,6 +1,6 @@
 module PF2d::Drawable(T)
   # Sort points from top to bottom
-  private def sort_verticies(p1 : PF2d::Vec, p2 : PF2d::Vec, p3 : PF2d::Vec)
+  private def sort_vertices(p1 : PF2d::Vec, p2 : PF2d::Vec, p3 : PF2d::Vec)
     p1, p2 = p2, p1 if p2.y < p1.y
     p1, p3 = p3, p1 if p3.y < p1.y
     p2, p3 = p3, p2 if p3.y < p2.y
@@ -9,7 +9,7 @@ module PF2d::Drawable(T)
 
   # Draw a filled in triangle
   def fill_triangle(p1 : PF2d::Vec, p2 : PF2d::Vec, p3 : PF2d::Vec, color)
-    p1, p2, p3 = sort_verticies(p1, p2, p3)
+    p1, p2, p3 = sort_vertices(p1, p2, p3)
 
     # sort left and right edges by run / rise
     line_left = PF2d::Line.new(p1, p2)

@@ -31,4 +31,13 @@ module PF2d::Viewable(T)
   def []?(point : PF2d::Vec2)
     get_point?(point)
   end
+
+  def each(rect : PF2d::Rect, & : T, Vec2(Int32) ->)
+    rect.top_left.y.upto(rect.top_left.y + rect.size.y - 1).each do |y|
+      rect.top_left.x.upto(rect.top_left.x + rect.size.x - 1).each do |x|
+        point = Vec[x, y]
+        yield get_point(point), point
+      end
+    end
+  end
 end
